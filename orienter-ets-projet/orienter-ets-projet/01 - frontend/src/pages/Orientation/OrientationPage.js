@@ -7,7 +7,7 @@ import './Orientation.css';
 function Orientation() {
   const handleSubmit = (formData) => {
     console.log('Données soumises:', formData);
-    // Ici vous pourriez envoyer les données à votre API
+    // Ici pour envoyer les données à votre API
     // et rediriger vers une page de résultats
   };
 
