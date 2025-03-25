@@ -1,8 +1,10 @@
 package com.nextgen.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="user")
@@ -20,7 +22,11 @@ public class User {
     private String password; //IL FAUT HASH CE PASSWORD
     private String nom;
     private String prenom;
-    private LocalDate date;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String role = "Utilisateur";
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDate date = LocalDate.now();
+
 
     public User(){}
 
@@ -80,5 +86,10 @@ public class User {
     public void setDate(LocalDate date) {
         this.date = date;
     }
+
+    public void setRole(String role){this.role = role;}
+
+    public String getRole(){return role;}
+
 }
 

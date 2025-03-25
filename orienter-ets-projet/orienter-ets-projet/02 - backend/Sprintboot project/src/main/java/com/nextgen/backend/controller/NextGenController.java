@@ -1,50 +1,93 @@
 package com.nextgen.backend.controller;
 
 import com.nextgen.backend.model.User;
-import com.nextgen.backend.service.NextGenService;
+import com.nextgen.backend.repository.NextGenUserRepository;
+import com.nextgen.backend.service.NextGenUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/nextgen")
 public class NextGenController {
 
-    private final NextGenService nextGenService;
+    private final NextGenUserService nextGenUserService;
+    private final NextGenUserRepository nextGenUserRepository;
 
     @Autowired
-    public NextGenController(NextGenService nextGenService) {
-        this.nextGenService = nextGenService;
+    public NextGenController(NextGenUserService nextGenUserService, NextGenUserRepository nextGenUserRepository) {
+        this.nextGenUserService = nextGenUserService;
+        this.nextGenUserRepository = nextGenUserRepository;
     }
 
     // Read Specific User
     @GetMapping("/user/{userId}")
-    public User getUserDetails(@PathVariable("userId") String userId) {
-        return nextGenService.getUser(userId);
+    public User getUserDetails(@PathVariable("userId") long userId) {
+        return nextGenUserService.getUserById(userId);
     }
 
     // Read all users
     @GetMapping("/users")
     public List<User> getAllUserDetails() {
-        return nextGenService.getAllUsers();
+        return nextGenUserService.getAllUsers();
     }
 
     @PostMapping("/user")
-    public String createUser(@RequestBody User user) {
-        nextGenService.createUser(user);
-        return "User created with success";
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        Map<String, Object> response = new HashMap<>();
+
+        if (nextGenUserService.existsByEmail(user.getEmail())){
+            response.put("message", "Error: account already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+        if (!nextGenUserService.isValidEmail(user.getEmail())){
+            response.put("message", "Error: invalid email");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if (!nextGenUserService.strongPassword(user.getPassword())){
+            response.put("message", "Error: weak password");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        if (nextGenUserService.createUser(user)){
+            response.put("message", "User created with success");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     @PutMapping("/user")
-    public String updateUser(@RequestBody User user) {
-        nextGenService.updateUser(user);
-        return "User updated with success";
+    public ResponseEntity<?> updateUser(@RequestBody User user) {
+        Map<String, Object> response = new HashMap<>();
+        if (!nextGenUserService.existsByEmail(user.getEmail())){
+            response.put("message","Error : Account does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if (nextGenUserService.updateUser(user)){
+            response.put("message","Account updated successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("message", "Wrong email and password combination");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    @DeleteMapping("/user/{userId}")
-    public String deleteUser(@PathVariable("userId") String userId) {
-        nextGenService.deleteUser(userId);
-        return "User deleted with success";
+    @DeleteMapping("/user")
+    public ResponseEntity<?> deleteUser(@RequestBody User user) {
+        Map<String, Object> response = new HashMap<>();
+        if (!nextGenUserService.existsByEmail(user.getEmail())){
+            response.put("message","Error : Account does not exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if (nextGenUserService.deleteUser(user)){
+            response.put("message","Account deleted successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("message", "Wrong email and password combination");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+
     }
 }
