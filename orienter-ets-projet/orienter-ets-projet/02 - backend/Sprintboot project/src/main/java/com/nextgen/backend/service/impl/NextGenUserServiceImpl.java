@@ -60,6 +60,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
             nextGenUserRepository.delete(oldUser);
             return true;
         }
+
     @Override
     public User getUserById(long userId) {
         //Insérer la logique supplémentaire ici
@@ -86,6 +87,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
 
         return nextGenUserRepository.findAll();
     }
+
     public boolean isValidEmail(String email) {
         if (email == null || email.isEmpty()) {
             return false;
@@ -95,6 +97,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         Pattern pattern = Pattern.compile(emailRegex);
         return pattern.matcher(email).matches();
     }
+
     public boolean strongPassword(String password){
         int numberCount = 0;
         for (char c : password.toCharArray()){
