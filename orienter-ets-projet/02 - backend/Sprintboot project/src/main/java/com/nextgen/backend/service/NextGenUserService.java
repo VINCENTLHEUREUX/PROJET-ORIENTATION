@@ -14,4 +14,5 @@ public interface NextGenUserService {
     public List<User> getAllUsers();
     public boolean isValidEmail(String email);
     public boolean strongPassword(String password);
+    public boolean loginUser(User user);
 }

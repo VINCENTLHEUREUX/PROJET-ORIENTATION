@@ -110,4 +110,18 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         }
         return false;
     }
+
+    public boolean loginUser(User user) {
+        if (user == null ||  user.getEmail() == null || user.getPassword() == null) {
+            return false;
+        }
+        if (!isValidEmail(user.getEmail())){
+            return false;
+        }
+        User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
+        if (existsByEmail(user.getEmail()) && user.getPassword().equals(userSave.getPassword())){
+            return true;
+        }
+        return false;
+    }
 }

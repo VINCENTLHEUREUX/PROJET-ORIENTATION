@@ -25,6 +25,21 @@ public class NextGenController {
         this.nextGenUserRepository = nextGenUserRepository;
     }
 
+    @PostMapping("/user/login")
+    public ResponseEntity<?> loginUser(@RequestBody User user){
+        Map<String, Object> response = new HashMap<>();
+        if (!nextGenUserService.existsByEmail(user.getEmail())){
+            response.put("message", "Error: account doesn't exist");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if (nextGenUserService.loginUser(user)){
+            response.put("message", "Login successful");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("message", "Error: internal server error");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
     // Read Specific User
     @GetMapping("/user/{userId}")
     public User getUserDetails(@PathVariable("userId") long userId) {
