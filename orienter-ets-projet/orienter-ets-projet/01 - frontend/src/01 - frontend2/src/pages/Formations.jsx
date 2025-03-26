@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/formations.css';
 
-// Données des baccalauréats (à adapter)
-const baccalaureats = [
+// Données des formations (baccalauréats)
+const formations = [
   {
     id: 'glo',
     titre: 'Génie logiciel',
@@ -60,20 +60,20 @@ const baccalaureats = [
   }
 ];
 
-export default function Baccalaureats() {
+export default function Formations() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('tous');
 
-  const filteredBaccalaureats = baccalaureats.filter(bac => {
-    const matchesSearch = bac.titre.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         bac.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filter === 'tous' || bac.code.toLowerCase() === filter.toLowerCase();
+  const filteredFormations = formations.filter(formation => {
+    const matchesSearch = formation.titre.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         formation.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filter === 'tous' || formation.code.toLowerCase() === filter.toLowerCase();
     return matchesSearch && matchesFilter;
   });
 
   return (
-    <div className="page-baccalaureats">
-      {/* Header (identique aux autres pages) */}
+    <div className="page-formations">
+      {/* Header */}
       <header className="header">
         <div className="header-container">
           <Link to="/">
@@ -91,7 +91,7 @@ export default function Baccalaureats() {
         <nav className="nav-bar">
           <ul className="nav-list">
             <li><Link to="/" className="nav-item">Accueil</Link></li>
-            <li><Link to="/baccalaureats" className="nav-item">Baccalauréats</Link></li>
+            <li><Link to="/formations" className="nav-item">Formations</Link></li>
             <li><a href="#" className="nav-item">Cycles supérieurs</a></li>
             <li><a href="#" className="nav-item">Certificats</a></li>
             <li><a href="#" className="nav-item">Formation continue</a></li>
@@ -101,8 +101,8 @@ export default function Baccalaureats() {
 
       {/* Contenu principal */}
       <main className="main-content">
-        <div className="baccalaureats-container">
-          <h1>Baccalauréats en génie</h1>
+        <div className="formations-container">
+          <h1>Formations en génie</h1>
           <p className="intro-text">
             Découvrez les programmes de baccalauréat offerts à l'ÉTS. Cliquez sur un programme pour voir
             les détails complets sur le site officiel de l'ÉTS.
@@ -122,35 +122,35 @@ export default function Baccalaureats() {
             <div className="filter-box">
               <select value={filter} onChange={(e) => setFilter(e.target.value)}>
                 <option value="tous">Tous les programmes</option>
-                {baccalaureats.map(bac => (
-                  <option key={bac.code} value={bac.code}>{bac.code}</option>
+                {formations.map(formation => (
+                  <option key={formation.code} value={formation.code}>{formation.code}</option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Liste des baccalauréats */}
-          <div className="baccalaureats-grid">
-            {filteredBaccalaureats.length > 0 ? (
-              filteredBaccalaureats.map(bac => (
-                <div key={bac.id} className="bac-card">
-                  <div className="bac-header">
-                    <h2>{bac.titre}</h2>
-                    <span className="bac-code">{bac.code}</span>
+          {/* Liste des formations */}
+          <div className="formations-grid">
+            {filteredFormations.length > 0 ? (
+              filteredFormations.map(formation => (
+                <div key={formation.id} className="formation-card">
+                  <div className="formation-header">
+                    <h2>{formation.titre}</h2>
+                    <span className="formation-code">{formation.code}</span>
                   </div>
-                  <div className="bac-body">
-                    <p>{bac.description}</p>
-                    <div className="bac-meta">
-                      <span><i className="far fa-clock"></i> {bac.duree}</span>
-                      <span><i className="fas fa-graduation-cap"></i> {bac.credits}</span>
+                  <div className="formation-body">
+                    <p>{formation.description}</p>
+                    <div className="formation-meta">
+                      <span><i className="far fa-clock"></i> {formation.duree}</span>
+                      <span><i className="fas fa-graduation-cap"></i> {formation.credits}</span>
                     </div>
                   </div>
-                  <div className="bac-footer">
+                  <div className="formation-footer">
                     <a 
-                      href={bac.url} 
+                      href={formation.url} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="bac-link"
+                      className="formation-link"
                     >
                       Voir sur le site de l'ÉTS <i className="fas fa-external-link-alt"></i>
                     </a>
@@ -167,7 +167,7 @@ export default function Baccalaureats() {
         </div>
       </main>
 
-      {/* Footer (identique aux autres pages) */}
+      {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-col">
