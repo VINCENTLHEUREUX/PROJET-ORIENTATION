@@ -7,7 +7,7 @@ const Header = () => (
     <div className="container mx-auto px-4 py-2 flex justify-between items-center">
       <Link to="/">
         <img
-          src="ETS-rouge-impr-fond_transparent.png"
+          src="src/images/ETS-rouge-impr-fond_transparent.png"
           alt="Logo ÉTS"
           className="h-12"
         />

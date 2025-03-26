@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import "../styles/accueil.css";
-import Header from "../components/Header";
 
 
 
@@ -10,7 +9,30 @@ export default function Accueil() {
   return (
     <div className="page-accueil">
       {/* Header */}
-      <Header />
+      <header className="header">
+        <div className="header-container">
+          <Link to="/">
+            <img
+              src="src/images/ETS-rouge-impr-fond_transparent.png"
+              alt="Logo ÉTS"
+              className="logo-ets"
+            />
+          </Link>
+          <div className="header-links">
+            <Link to="/connexion" className="link-ets">Connexion</Link>
+            <Link to="/inscription" className="link-ets">Inscription</Link>
+          </div>
+        </div>
+        <nav className="nav-bar">
+          <ul className="nav-list">
+            <li><Link to="/" className="nav-item">Accueil</Link></li>
+            <li><a href="#" className="nav-item">Premier cycle</a></li>
+            <li><a href="#" className="nav-item">Cycles supérieurs</a></li>
+            <li><a href="#" className="nav-item">Certificats</a></li>
+            <li><a href="#" className="nav-item">Formation continue</a></li>
+          </ul>
+        </nav>
+      </header>
 
       {/* Contenu principal */}
       <main className="main-content">

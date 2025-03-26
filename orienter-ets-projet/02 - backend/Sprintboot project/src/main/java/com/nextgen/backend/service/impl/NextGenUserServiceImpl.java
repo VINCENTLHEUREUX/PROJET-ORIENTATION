@@ -95,7 +95,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
 
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         Pattern pattern = Pattern.compile(emailRegex);
-        return true;
+        return pattern.matcher(email).matches();
     }
 
     public boolean strongPassword(String password){

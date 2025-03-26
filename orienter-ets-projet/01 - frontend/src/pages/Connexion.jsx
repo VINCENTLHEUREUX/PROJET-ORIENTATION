@@ -6,8 +6,8 @@ import '../styles/connexion.css';
 
 export default function Connexion() {
   const [donneesConnexion, setDonneesConnexion] = useState({
-    email: '',
-    password: '',
+    userId: '',
+    motDePasse: '',
   });
 
   const [erreurs, setErreurs] = useState({});
@@ -23,30 +23,31 @@ export default function Connexion() {
     e.preventDefault();
     const nouvellesErreurs = {};
 
-    if (!donneesConnexion.email.trim()) nouvellesErreurs.email = 'L’identifiant est requis';
-    if (!donneesConnexion.password.trim()) nouvellesErreurs.password = 'Le mot de passe est requis';
+    if (!donneesConnexion.userId.trim()) nouvellesErreurs.userId = 'L’identifiant est requis';
+    if (!donneesConnexion.motDePasse.trim()) nouvellesErreurs.motDePasse = 'Le mot de passe est requis';
 
     if (Object.keys(nouvellesErreurs).length > 0) {
       setErreurs(nouvellesErreurs);
     } else {
-      fetch("http://localhost:8080/nextgen/user/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(donneesConnexion)
-      })
+      fetch(`http://localhost:8080/nextgen/user/${donneesConnexion.userId}`)
         .then(res => {
-          if (res.ok) return res.text();
-          return res.json().then(errorData => {
-            throw new Error(errorData.message || "Erreur lors de l’inscription");
-          });
+          if (!res.ok) throw new Error("Utilisateur non trouvé");
+          return res.json();
         })
-        .then(message => {
-          setMessageSucces(message);
-          setErreurs({});
+        .then(user => {
+          if (user.motDePasse === donneesConnexion.motDePasse) {
+            setMessageSucces("Connexion réussie !");
+            setErreurs({});
+            setDonneesConnexion({ userId: '', motDePasse: '' });
+          } else {
+            throw new Error("Mot de passe incorrect");
+          }
         })
-        .catch(err => setErreurs({ global: err.message }));
-  }
-}
+        .catch(err => {
+          setErreurs({ global: err.message });
+        });
+    }
+  };
 
   return (
     <div className="page-connexion">
@@ -64,27 +65,27 @@ export default function Connexion() {
 
           <form className="connexion-form" onSubmit={gererSoumission}>
             <div>
-              <label>Identifiant (email)</label>
+              <label>Identifiant (userId)</label>
               <input
                 type="text"
-                name="email"
-                value={donneesConnexion.email}
+                name="userId"
+                value={donneesConnexion.userId}
                 onChange={gererChangement}
-                className={`input ${erreurs.email ? 'input-erreur' : ''}`}
+                className={`input ${erreurs.userId ? 'input-erreur' : ''}`}
               />
-              {erreurs.email && <p className="texte-erreur">{erreurs.email}</p>}
+              {erreurs.userId && <p className="texte-erreur">{erreurs.userId}</p>}
             </div>
 
             <div>
               <label>Mot de passe</label>
               <input
                 type="password"
-                name="password"
-                value={donneesConnexion.password}
+                name="motDePasse"
+                value={donneesConnexion.motDePasse}
                 onChange={gererChangement}
-                className={`input ${erreurs.password ? 'input-erreur' : ''}`}
+                className={`input ${erreurs.motDePasse ? 'input-erreur' : ''}`}
               />
-              {erreurs.password && <p className="texte-erreur">{erreurs.password}</p>}
+              {erreurs.motDePasse && <p className="texte-erreur">{erreurs.motDePasse}</p>}
             </div>
 
             <button type="submit" className="bouton-valider">

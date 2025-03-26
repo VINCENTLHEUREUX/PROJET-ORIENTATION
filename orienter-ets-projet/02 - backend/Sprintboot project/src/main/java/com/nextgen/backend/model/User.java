@@ -9,10 +9,15 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name="user")
 
+/*
+L'IDENTIFIANT DE L'UTILISATEUR SERA GÉNÉRÉ AUTOMATIQUEMENT PAR LE PROGRAMME. VEUILLEZ NE PAS L'INCULURE DANS LES REQUÊTES.
+ */
+
 
 public class User {
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
     private String email;
     private String password; //IL FAUT HASH CE PASSWORD
     private String nom;
@@ -25,7 +30,7 @@ public class User {
 
     public User(){}
 
-    public User(String userId, String email, String password, String nom, String prenom, LocalDate date){
+    public User(Long userId, String email, String password, String nom, String prenom, LocalDate date){
         this.userId = userId;
         this.email = email;
         this.password = password;
@@ -34,11 +39,11 @@ public class User {
         this.date = date;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
