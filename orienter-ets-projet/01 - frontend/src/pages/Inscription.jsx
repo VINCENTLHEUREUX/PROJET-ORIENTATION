@@ -9,14 +9,14 @@ const Inscription = () => {
   const [donneesFormulaire, setDonneesFormulaire] = useState({
     nom: '',
     prenom: '',
-    courriel: '',
-    motDePasse: '',
+    email: '',
+    password: '',
   });
 
   const [erreurs, setErreurs] = useState({});
   const [messageSucces, setMessageSucces] = useState('');
 
-  const validerCourriel = (courriel) => /\S+@\S+\.\S+/.test(courriel);
+  const validerCourriel = (email) => /\S+@\S+\.\S+/.test(email);
 
   const gererChangement = (e) => {
     setDonneesFormulaire({ ...donneesFormulaire, [e.target.name]: e.target.value });
@@ -27,13 +27,13 @@ const Inscription = () => {
   const gererSoumission = (e) => {
     e.preventDefault();
     const nouvellesErreurs = {};
-
+  
     if (!donneesFormulaire.nom.trim()) nouvellesErreurs.nom = 'Le nom est requis';
     if (!donneesFormulaire.prenom.trim()) nouvellesErreurs.prenom = 'Le prénom est requis';
-    if (!donneesFormulaire.courriel.trim()) nouvellesErreurs.courriel = 'Le courriel est requis';
-    else if (!validerCourriel(donneesFormulaire.courriel)) nouvellesErreurs.courriel = 'Format de courriel invalide';
-    if (!donneesFormulaire.motDePasse.trim()) nouvellesErreurs.motDePasse = 'Le mot de passe est requis';
-
+    if (!donneesFormulaire.email.trim()) nouvellesErreurs.email = 'Le courriel est requis';
+    else if (!validerCourriel(donneesFormulaire.email)) nouvellesErreurs.email = 'Format de courriel invalide';
+    if (!donneesFormulaire.password.trim()) nouvellesErreurs.password = 'Le mot de passe est requis';
+  
     if (Object.keys(nouvellesErreurs).length > 0) {
       setErreurs(nouvellesErreurs);
     } else {
@@ -44,11 +44,13 @@ const Inscription = () => {
       })
         .then(res => {
           if (res.ok) return res.text();
-          throw new Error("Erreur lors de l’inscription");
+          return res.json().then(errorData => {
+            throw new Error(errorData.message || "Erreur lors de l’inscription");
+          });
         })
         .then(message => {
           setMessageSucces(message);
-          setDonneesFormulaire({ nom: '', prenom: '', courriel: '', motDePasse: '' });
+          setDonneesFormulaire({ nom: '', prenom: '', email: '', password: '' });
           setErreurs({});
         })
         .catch(err => setErreurs({ global: err.message }));
@@ -66,11 +68,11 @@ const Inscription = () => {
           {erreurs.global && <div className="message-erreur">{erreurs.global}</div>}
 
           <form className="inscription-form" onSubmit={gererSoumission}>
-            {['nom', 'prenom', 'courriel', 'motDePasse'].map((champ, i) => (
+            {['nom', 'prenom', 'email', 'password'].map((champ, i) => (
               <div key={i}>
-                <label htmlFor={champ}>{champ === 'motDePasse' ? 'Mot de passe' : champ.charAt(0).toUpperCase() + champ.slice(1)}</label>
+                <label htmlFor={champ}>{champ === 'password' ? 'Mot de passe' : champ.charAt(0).toUpperCase() + champ.slice(1)}</label>
                 <input
-                  type={champ === 'motDePasse' ? 'password' : (champ === 'courriel' ? 'email' : 'text')}
+                  type={champ === 'password' ? 'password' : (champ === 'email' ? 'email' : 'text')}
                   name={champ}
                   value={donneesFormulaire[champ]}
                   onChange={gererChangement}
