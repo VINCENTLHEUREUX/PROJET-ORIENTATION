@@ -4,6 +4,7 @@ import Accueil from "./pages/Accueil";
 import Connexion from "./pages/Connexion";
 import Inscription from "./pages/Inscription";
 import Orientation from "./pages/Orientation";
+import Formation from "./pages/Formations";
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <Route path="/connexion" element={<Connexion />} />
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/orientation" element = {<Orientation/>} />
+        <Route path="/formations" element = {<Formations/>} />
       </Routes>
     </Router>
   );
