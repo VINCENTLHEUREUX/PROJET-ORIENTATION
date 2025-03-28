@@ -2,13 +2,14 @@ package com.nextgen.backend.service.impl;
 
 
 import com.nextgen.backend.model.ResultatQuizz;
+import com.nextgen.backend.service.NextGenResultatService;
 import org.springframework.stereotype.Service;
 import com.nextgen.backend.repository.NextGenResultatRepository;
 
 import javax.xml.transform.Result;
 
 @Service
-public class NextGenResultatServiceImpl {
+public class NextGenResultatServiceImpl implements NextGenResultatService {
     NextGenResultatRepository nextGenResultatRepository;
 
     public NextGenResultatServiceImpl (NextGenResultatRepository nextGenResultatRepository) {
@@ -16,7 +17,7 @@ public class NextGenResultatServiceImpl {
     }
 
     public ResultatQuizz findByResultId(Long resultId) {
-        ResultatQuizz Quizz = nextGenResultatRepository.findByQuizzId(String.valueOf(resultId));
+        ResultatQuizz Quizz = nextGenResultatRepository.findByResultId(resultId);
         if (Quizz != null){
             return Quizz;
         }
@@ -30,9 +31,17 @@ public class NextGenResultatServiceImpl {
         return false;
     }
 
-    public boolean createResult(ResultatQuizz result){
-        nextGenResultatRepository.save(result);
-        return true;
+    public boolean createResult(ResultatQuizz result) {
+        System.out.println("Attempting to save: " + result.getUserId() + " " + result.getResultatGLO());
+        try {
+            ResultatQuizz saved = nextGenResultatRepository.save(result);
+            System.out.println("Save result: " + (saved != null ? "success" : "failed"));
+            return true;
+        } catch (Exception e) {
+            System.out.println("Error saving: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean deleteByResultId(long resultId){
@@ -46,7 +55,12 @@ public class NextGenResultatServiceImpl {
         nextGenResultatRepository.delete(quizzCopie);
         return true;
     }
-    ResultatQuizz findTopByUserIdOrderByTimeDesc(long userId){
+    public ResultatQuizz findTopByUserIdOrderByTimeDesc(long userId){
         return nextGenResultatRepository.findTopByUserIdOrderByTimeDesc(userId);
+    }
+
+    @Override
+    public boolean existsByUserId(Long userId) {
+        return nextGenResultatRepository.existsByUserId(userId);
     }
 }

@@ -4,6 +4,7 @@ import com.nextgen.backend.model.ResultatQuizz;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NextGenResultatRepository extends JpaRepository<ResultatQuizz, Long> {
-    ResultatQuizz findByQuizzId (String quizzId);
+    ResultatQuizz findByResultId (long resultId);
     ResultatQuizz findTopByUserIdOrderByTimeDesc(long userId);
+    boolean existsByUserId(long userId);
 }

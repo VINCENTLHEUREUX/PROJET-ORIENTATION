@@ -7,4 +7,5 @@ public interface NextGenResultatService {
     ResultatQuizz findByResultId(Long resultId);
     ResultatQuizz findTopByUserIdOrderByTimeDesc(long userId);
     boolean existsByUserId(Long userId);
+    boolean createResult(ResultatQuizz result);
 }

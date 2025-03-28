@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class ResultatQuizz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long resultId;
+    private long resultId;
     private long userId;
     private int resultatGLO;
     private int resultatELE;
@@ -18,13 +18,12 @@ public class ResultatQuizz {
     private int resultatCIV;
     private int resultatIND;
     private int resultatLOG;
-    private LocalDateTime time;
+    private LocalDateTime time = LocalDateTime.now();
 
 /******************************** CONSTRUCTEUR AVEC PARAM **************************************/
-    public ResultatQuizz(Long resultId, long userId, int resultatGLO, int resultatELE,
+    public ResultatQuizz(long resultId, long userId, int resultatGLO, int resultatELE,
                          int resultatMEC, int resultatCIV, int resultatIND, int resultatLOG)
     {
-        this.resultId = resultId;
         this.userId = userId;
         this.resultatGLO = resultatGLO;
         this.resultatELE = resultatELE;
@@ -38,7 +37,7 @@ public class ResultatQuizz {
     public ResultatQuizz(){};
 
 /********************************* SETTERS *****************************/
-    public void setResultId(Long resultId) {
+    public void setResultId(long resultId) {
         this.resultId = resultId;
     }
 

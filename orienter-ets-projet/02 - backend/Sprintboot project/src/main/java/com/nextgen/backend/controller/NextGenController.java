@@ -46,8 +46,8 @@ public class NextGenController {
          */
     }
 
-    @GetMapping("/result")
-    public ResponseEntity<?> getResult(@RequestParam Long userId) {
+    @GetMapping("/result/{userId}")
+    public ResponseEntity<?> getResult(@PathVariable  Long userId) {
 
         Map<String, Object> response = new HashMap<>();
         ResultatQuizz resultat = nextGenResultatService.findTopByUserIdOrderByTimeDesc(userId);
@@ -59,6 +59,15 @@ public class NextGenController {
         response.put("message", "Success");
         response.put("civ", resultat.getResultatCIV());
         response.put("log", resultat.getResultatLOG());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @PostMapping("/result")
+    public ResponseEntity<?> postResult(@RequestBody ResultatQuizz quizz) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Success");
+        nextGenResultatService.createResult(quizz);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
