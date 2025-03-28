@@ -1,10 +1,10 @@
 package com.nextgen.backend.controller;
 
-import com.nextgen.backend.model.ProgramInfo;
+import com.nextgen.backend.model.ResultatQuizz;
 import com.nextgen.backend.model.User;
-import com.nextgen.backend.repository.NextGenProgramsRepository;
+import com.nextgen.backend.repository.NextGenResultatRepository;
 import com.nextgen.backend.repository.NextGenUserRepository;
-import com.nextgen.backend.service.NextGenProgramsService;
+import com.nextgen.backend.service.NextGenResultatService;
 import com.nextgen.backend.service.NextGenUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,18 +21,47 @@ public class NextGenController {
 
     private final NextGenUserService nextGenUserService;
     private final NextGenUserRepository nextGenUserRepository;
-    private final NextGenProgramsService nextGenProgramsService;
-    private final NextGenProgramsRepository nextGenProgramsRepository;
+    private final NextGenResultatService nextGenResultatService;
+    private final NextGenResultatRepository nextGenResultatRepository;
+
+    /*
+        private final NextGenProgramsService nextGenProgramsService;
+        private final NextGenProgramsRepository nextGenProgramsRepository;
+     */
+
 
     @Autowired
     public NextGenController(NextGenUserService nextGenUserService,
                              NextGenUserRepository nextGenUserRepository,
-                             NextGenProgramsService nextGenProgramsService, NextGenProgramsRepository nextGenProgramsRepository) {
+                             NextGenResultatService nextGenResultatService,
+                             NextGenResultatRepository nextGenResultatRepository) {
         this.nextGenUserService = nextGenUserService;
         this.nextGenUserRepository = nextGenUserRepository;
-        this.nextGenProgramsService = nextGenProgramsService;
-        this.nextGenProgramsRepository = nextGenProgramsRepository;
+        this.nextGenResultatService = nextGenResultatService;
+        this.nextGenResultatRepository = nextGenResultatRepository;
+
+        /*
+            this.nextGenProgramsService = nextGenProgramsService;
+            this.nextGenProgramsRepository = nextGenProgramsRepository;
+         */
     }
+
+    @GetMapping("/result")
+    public ResponseEntity<?> getResult(@RequestParam Long userId) {
+
+        Map<String, Object> response = new HashMap<>();
+        ResultatQuizz resultat = nextGenResultatService.findTopByUserIdOrderByTimeDesc(userId);
+        if(!nextGenResultatService.existsByUserId(userId)){
+            response.put("message", "Error: Result not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.put("message", "Success");
+        response.put("civ", resultat.getResultatCIV());
+        response.put("log", resultat.getResultatLOG());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     @PostMapping("/user/login")
     public ResponseEntity<?> loginUser(@RequestBody User user){
@@ -47,18 +76,6 @@ public class NextGenController {
         }
         response.put("message", "Error: internal server error");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    }
-
-    // Read Specific User
-    @GetMapping("/user/{userId}")
-    public User getUserDetails(@PathVariable("userId") long userId) {
-        return nextGenUserService.getUserById(userId);
-    }
-
-    // Read all users
-    @GetMapping("/users")
-    public List<User> getAllUserDetails() {
-        return nextGenUserService.getAllUsers();
     }
 
     @PostMapping("/user")
@@ -114,7 +131,7 @@ public class NextGenController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 
     }
-
+/*
     @GetMapping("/program")
     public ResponseEntity<?> getProgram(@RequestParam String sigle) {
         Map<String, Object> response = new HashMap<>();
@@ -183,8 +200,5 @@ public class NextGenController {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-    //  @GetMapping("/users")
-   // public List<User> getAllUserDetails() {
-  //      return nextGenUserService.getAllUsers();
-   // }
+ */
 }
