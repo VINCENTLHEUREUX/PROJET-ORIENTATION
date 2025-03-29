@@ -1,6 +1,8 @@
 package com.nextgen.backend.model;
 
+import com.nextgen.backend.repository.NextGenUserRepository;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +13,7 @@ public class ResultatQuizz {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long resultId;
-    private long userId;
+    private String email;
     private int resultatGLO;
     private int resultatELE;
     private int resultatMEC;
@@ -19,12 +21,15 @@ public class ResultatQuizz {
     private int resultatIND;
     private int resultatLOG;
     private LocalDateTime time = LocalDateTime.now();
+    @Transient
+    @Autowired
+    NextGenUserRepository nextGenUserRepository;
 
 /******************************** CONSTRUCTEUR AVEC PARAM **************************************/
-    public ResultatQuizz(long resultId, long userId, int resultatGLO, int resultatELE,
+    public ResultatQuizz(long resultId, String email, int resultatGLO, int resultatELE,
                          int resultatMEC, int resultatCIV, int resultatIND, int resultatLOG)
     {
-        this.userId = userId;
+        this.email = email;
         this.resultatGLO = resultatGLO;
         this.resultatELE = resultatELE;
         this.resultatMEC = resultatMEC;
@@ -41,8 +46,8 @@ public class ResultatQuizz {
         this.resultId = resultId;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setResultatGLO(int resultatGLO) {
@@ -74,8 +79,8 @@ public class ResultatQuizz {
         return resultId;
     }
 
-    public long getUserId() {
-        return userId;
+    public String getEmail() {
+        return email;
     }
 
     public int getResultatGLO() {

@@ -1,16 +1,18 @@
 package com.nextgen.backend.service.impl;
 
 
+import com.nextgen.backend.model.ResultatRequest;
 import com.nextgen.backend.model.ResultatQuizz;
+import com.nextgen.backend.model.User;
 import com.nextgen.backend.service.NextGenResultatService;
+import com.nextgen.backend.service.NextGenUserService;
 import org.springframework.stereotype.Service;
 import com.nextgen.backend.repository.NextGenResultatRepository;
-
-import javax.xml.transform.Result;
 
 @Service
 public class NextGenResultatServiceImpl implements NextGenResultatService {
     NextGenResultatRepository nextGenResultatRepository;
+    NextGenUserService nextGenUserService;
 
     public NextGenResultatServiceImpl (NextGenResultatRepository nextGenResultatRepository) {
         this.nextGenResultatRepository = nextGenResultatRepository;
@@ -24,6 +26,7 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         return null;
     }
 
+
     public boolean existsByResultId(Long resultId){
         if (findByResultId(resultId) != null){
             return true;
@@ -32,16 +35,8 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
     }
 
     public boolean createResult(ResultatQuizz result) {
-        System.out.println("Attempting to save: " + result.getUserId() + " " + result.getResultatGLO());
-        try {
             ResultatQuizz saved = nextGenResultatRepository.save(result);
-            System.out.println("Save result: " + (saved != null ? "success" : "failed"));
             return true;
-        } catch (Exception e) {
-            System.out.println("Error saving: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public boolean deleteByResultId(long resultId){
@@ -55,12 +50,29 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         nextGenResultatRepository.delete(quizzCopie);
         return true;
     }
-    public ResultatQuizz findTopByUserIdOrderByTimeDesc(long userId){
-        return nextGenResultatRepository.findTopByUserIdOrderByTimeDesc(userId);
+    public ResultatQuizz findTopByEmailOrderByTimeDesc(String email){
+        return nextGenResultatRepository.findTopByEmailOrderByTimeDesc(email);
     }
 
-    @Override
-    public boolean existsByUserId(Long userId) {
-        return nextGenResultatRepository.existsByUserId(userId);
+    public boolean existsByEmail(String email) {
+        return nextGenResultatRepository.existsByEmail(email);
     }
+    public ResultatQuizz getResultatFromRequest(ResultatRequest resultatRequest){
+        ResultatQuizz resultatQuizz = new ResultatQuizz();
+        resultatQuizz.setResultatCIV(resultatRequest.getResultatCIV());
+        resultatQuizz.setResultatELE(resultatRequest.getResultatELE());
+        resultatQuizz.setResultatGLO(resultatRequest.getResultatGLO());
+        resultatQuizz.setResultatIND(resultatRequest.getResultatIND());
+        resultatQuizz.setResultatLOG(resultatRequest.getResultatLOG());
+        resultatQuizz.setResultatMEC(resultatRequest.getResultatMEC());
+        resultatQuizz.setEmail(resultatRequest.getEmail());
+        return resultatQuizz;
+    }
+    public User getUserFromRequest(ResultatRequest resultatRequest){
+        User user = new User();
+        user.setEmail(resultatRequest.getEmail());
+        user.setPassword(resultatRequest.getPassword());
+            return user;
+    }
+
 }

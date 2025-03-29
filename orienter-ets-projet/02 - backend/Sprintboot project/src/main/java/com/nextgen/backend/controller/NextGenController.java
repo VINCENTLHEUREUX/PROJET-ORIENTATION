@@ -1,6 +1,7 @@
 package com.nextgen.backend.controller;
 
 import com.nextgen.backend.model.ResultatQuizz;
+import com.nextgen.backend.model.ResultatRequest;
 import com.nextgen.backend.model.User;
 import com.nextgen.backend.repository.NextGenResultatRepository;
 import com.nextgen.backend.repository.NextGenUserRepository;
@@ -20,55 +21,55 @@ import java.util.Map;
 public class NextGenController {
 
     private final NextGenUserService nextGenUserService;
-    private final NextGenUserRepository nextGenUserRepository;
     private final NextGenResultatService nextGenResultatService;
-    private final NextGenResultatRepository nextGenResultatRepository;
-
-    /*
-        private final NextGenProgramsService nextGenProgramsService;
-        private final NextGenProgramsRepository nextGenProgramsRepository;
-     */
 
 
     @Autowired
     public NextGenController(NextGenUserService nextGenUserService,
-                             NextGenUserRepository nextGenUserRepository,
-                             NextGenResultatService nextGenResultatService,
-                             NextGenResultatRepository nextGenResultatRepository) {
+                             NextGenResultatService nextGenResultatService) {
         this.nextGenUserService = nextGenUserService;
-        this.nextGenUserRepository = nextGenUserRepository;
         this.nextGenResultatService = nextGenResultatService;
-        this.nextGenResultatRepository = nextGenResultatRepository;
-
-        /*
-            this.nextGenProgramsService = nextGenProgramsService;
-            this.nextGenProgramsRepository = nextGenProgramsRepository;
-         */
     }
 
-    @GetMapping("/result/{userId}")
-    public ResponseEntity<?> getResult(@PathVariable  Long userId) {
+    @PostMapping("/results")
+    public ResponseEntity<?> getResult(@RequestBody ResultatRequest resultatRequest) {
 
         Map<String, Object> response = new HashMap<>();
-        ResultatQuizz resultat = nextGenResultatService.findTopByUserIdOrderByTimeDesc(userId);
-        if(!nextGenResultatService.existsByUserId(userId)){
-            response.put("message", "Error: Result not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        User user = nextGenResultatService.getUserFromRequest(resultatRequest);
+        if (nextGenUserService.loginUser(user)){
+            ResultatQuizz resultat =
+                    nextGenResultatService.findTopByEmailOrderByTimeDesc(resultatRequest.getEmail());
+            if(resultat == null){
+                response.put("message", "Error: Result not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            response.put("message", "Success");
+            response.put("resultatciv", resultat.getResultatCIV());
+            response.put("resultatele", resultat.getResultatELE());
+            response.put("resultatglo", resultat.getResultatGLO());
+            response.put("resultatind", resultat.getResultatIND());
+            response.put("resultatlog", resultat.getResultatLOG());
+            response.put("resultatmec", resultat.getResultatMEC());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
+        response.put("message", "Error: login failed");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);        }
 
-        response.put("message", "Success");
-        response.put("civ", resultat.getResultatCIV());
-        response.put("log", resultat.getResultatLOG());
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
     @PostMapping("/result")
-    public ResponseEntity<?> postResult(@RequestBody ResultatQuizz quizz) {
+    public ResponseEntity<?> postResult(@RequestBody ResultatRequest resultatRequest) {
 
         Map<String, Object> response = new HashMap<>();
-
-        response.put("message", "Success");
-        nextGenResultatService.createResult(quizz);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        User user = nextGenResultatService.getUserFromRequest(resultatRequest);
+        if (nextGenUserService.loginUser(user)){
+            response.put("message", "Success");
+            ResultatQuizz quizz =
+                    nextGenResultatService.getResultatFromRequest(resultatRequest);
+            nextGenResultatService.createResult(quizz);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("message", "Error: could not get user");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
 
