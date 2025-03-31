@@ -1,52 +1,96 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Link } from 'react-router-dom';
 import '../styles/connexion.css';
 
 export default function Connexion() {
   const [donneesConnexion, setDonneesConnexion] = useState({
     email: '',
-    password: '',
+    password: ''
   });
-
   const [erreurs, setErreurs] = useState({});
   const [messageSucces, setMessageSucces] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const validerEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const gererChangement = (e) => {
-    setDonneesConnexion({ ...donneesConnexion, [e.target.name]: e.target.value });
-    setErreurs({ ...erreurs, [e.target.name]: '' });
+    const { name, value } = e.target;
+    setDonneesConnexion(prev => ({ ...prev, [name]: value }));
+    
+    // Effacer l'erreur quand l'utilisateur corrige
+    if (erreurs[name]) {
+      setErreurs(prev => ({ ...prev, [name]: '' }));
+    }
     setMessageSucces('');
   };
 
-  const gererSoumission = (e) => {
+  const gererSoumission = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const nouvellesErreurs = {};
-
-    if (!donneesConnexion.email.trim()) nouvellesErreurs.email = 'L’identifiant est requis';
-    if (!donneesConnexion.password.trim()) nouvellesErreurs.password = 'Le mot de passe est requis';
+    
+    // Validation
+    if (!donneesConnexion.email.trim()) {
+      nouvellesErreurs.email = 'Email est requis';
+    } else if (!validerEmail(donneesConnexion.email)) {
+      nouvellesErreurs.email = 'Format d\'email invalide';
+    }
+    
+    if (!donneesConnexion.password.trim()) {
+      nouvellesErreurs.password = 'Le mot de passe est requis';
+    }
 
     if (Object.keys(nouvellesErreurs).length > 0) {
       setErreurs(nouvellesErreurs);
-    } else {
-      fetch("http://localhost:8080/nextgen/user/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(donneesConnexion)
-      })
-        .then(res => {
-          if (res.ok) return res.text();
-          return res.json().then(errorData => {
-            throw new Error(errorData.message || "Erreur lors de l’inscription");
-          });
-        })
-        .then(message => {
-          setMessageSucces(message);
-          setErreurs({});
-        })
-        .catch(err => setErreurs({ global: err.message }));
-  }
-}
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/nextgen/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: donneesConnexion.email,
+          password: donneesConnexion.password
+        }),
+        credentials: 'include' // Pour gérer les cookies si nécessaire
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Échec de la connexion");
+      }
+
+      const data = await response.json();
+      
+      // Stocker le token si présent dans la réponse
+      if (data.token) {
+        localStorage.setItem('authToken', data.token);
+      }
+
+      setMessageSucces("Connexion réussie ! Redirection...");
+      setErreurs({});
+      setDonneesConnexion({ email: '', password: '' });
+
+      // Redirection après 2 secondes
+      setTimeout(() => {
+        navigate('/'); // Rediriger vers la page d'accueil ou tableau de bord
+      }, 2000);
+
+    } catch (err) {
+      setErreurs({ 
+        global: err.message || "Email ou mot de passe incorrect" 
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="page-connexion">
@@ -54,48 +98,74 @@ export default function Connexion() {
       <main className="connexion-main">
         <div className="connexion-box">
           <h2 className="connexion-title">Connexion</h2>
-
+          
           {messageSucces && (
-            <div className="message-succes">{messageSucces}</div>
+            <div className="message-succes">
+              {messageSucces}
+            </div>
           )}
+          
           {erreurs.global && (
-            <div className="message-erreur">{erreurs.global}</div>
+            <div className="message-erreur">
+              {erreurs.global}
+            </div>
           )}
-
+          
           <form className="connexion-form" onSubmit={gererSoumission}>
-            <div>
-              <label>Identifiant (email)</label>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
               <input
-                type="text"
+                type="email"
+                id="email"
                 name="email"
                 value={donneesConnexion.email}
                 onChange={gererChangement}
                 className={`input ${erreurs.email ? 'input-erreur' : ''}`}
+                autoComplete="email"
               />
-              {erreurs.email && <p className="texte-erreur">{erreurs.email}</p>}
+              {erreurs.email && (
+                <p className="texte-erreur">{erreurs.email}</p>
+              )}
             </div>
-
-            <div>
-              <label>Mot de passe</label>
+            
+            <div className="form-group">
+              <label htmlFor="password">Mot de passe</label>
               <input
                 type="password"
+                id="password"
                 name="password"
                 value={donneesConnexion.password}
                 onChange={gererChangement}
                 className={`input ${erreurs.password ? 'input-erreur' : ''}`}
+                autoComplete="current-password"
               />
-              {erreurs.password && <p className="texte-erreur">{erreurs.password}</p>}
+              {erreurs.password && (
+                <p className="texte-erreur">{erreurs.password}</p>
+              )}
             </div>
-
-            <button type="submit" className="bouton-valider">
-              Se connecter
+            
+            <button 
+              type="submit" 
+              className="bouton-valider"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
           </form>
-
-          <p className="lien-inscription">
-            Vous n’avez pas de compte ?{' '}
-            <Link to="/inscription" className="texte-lien">S’inscrire</Link>
-          </p>
+          
+          <div className="connexion-links">
+            <p className="lien-inscription">
+              Vous n'avez pas de compte ?{' '}
+              <Link to="/inscription" className="texte-lien">
+                S'inscrire
+              </Link>
+            </p>
+            <p className="lien-motdepasse-oublie">
+              <Link to="/mot-de-passe-oublie" className="texte-lien">
+                Mot de passe oublié ?
+              </Link>
+            </p>
+          </div>
         </div>
       </main>
       <Footer />

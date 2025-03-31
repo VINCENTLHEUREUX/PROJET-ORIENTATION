@@ -22,6 +22,12 @@ const Header = () => (
         <Link to="/inscription" className="text-ets-red hover:text-ets-darkred font-medium">
           Inscription
         </Link>
+        <link to="/orientation" ClassName="text-ets-red hover:text-ets-darkred font-medium">
+          Quiz d'orientation
+        </link>
+        <link to="/formation" ClassName="text-ets-red hover:text-ets-darkred font-medium">
+          Formations
+        </link>
       </div>
     </div>
     <nav className="bg-ets-red">

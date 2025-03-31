@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import "../styles/orientation.css";
+import axios from 'axios';
 
 export default function Orientation() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     interets: [],
@@ -16,7 +20,45 @@ export default function Orientation() {
     },
     niveauEducation: '',
     domainePreference: '',
-    experienceProfessionnelle: ''
+    experienceProfessionnelle: '',
+    evaluationFormations: {
+      glo: {
+        programmation: 3,
+        conceptionLogicielle: 3,
+        baseDonnees: 3,
+        travailEquipe: 3
+      },
+      ele: {
+        circuits: 3,
+        electronique: 3,
+        telecommunications: 3,
+        automatisation: 3
+      },
+      mec: {
+        conceptionMecanique: 3,
+        thermodynamique: 3,
+        materiaux: 3,
+        fabrication: 3
+      },
+      civ: {
+        structuresGeniesCivil: 3,
+        hydraulique: 3,
+        environnement: 3,
+        gestionProjets: 3
+      },
+      ind: {
+        optimisationSystemes: 3,
+        gestionProduction: 3,
+        ergonomie: 3,
+        qualite: 3
+      },
+      log: {
+        chaineApprovisionnement: 3,
+        transportLogistique: 3,
+        gestionStocks: 3,
+        planificationProduction: 3
+      }
+    }
   });
 
   const interetsOptions = [
@@ -46,9 +88,58 @@ export default function Orientation() {
   const domainePreferenceOptions = [
     'Génie logiciel', 'Génie électrique', 'Génie mécanique', 'Génie civil',
     'Architecture', 'Technologies de l\'information', 'Génie industriel',
-    'Génie de la construction', 'Génie de la production automatisée',
-    'Génie des opérations et de la logistique'
+    'Génie de la construction', 'Génie des opérations et de la logistique'
   ];
+
+  // Configuration des questions d'évaluation pour chaque programme
+  const evaluationQuestions = {
+    glo: [
+      { id: 'programmation', label: 'Votre niveau en programmation et développement de logiciels' },
+      { id: 'conceptionLogicielle', label: 'Votre aptitude à concevoir des architectures logicielles' },
+      { id: 'baseDonnees', label: 'Votre compréhension des bases de données et systèmes d\'information' },
+      { id: 'travailEquipe', label: 'Votre capacité à travailler en équipe sur des projets logiciels' }
+    ],
+    ele: [
+      { id: 'circuits', label: 'Votre compréhension des circuits électriques' },
+      { id: 'electronique', label: 'Votre intérêt pour l\'électronique et les composants' },
+      { id: 'telecommunications', label: 'Votre connaissance des systèmes de télécommunications' },
+      { id: 'automatisation', label: 'Votre aptitude à comprendre les systèmes d\'automatisation' }
+    ],
+    mec: [
+      { id: 'conceptionMecanique', label: 'Votre capacité à concevoir des systèmes mécaniques' },
+      { id: 'thermodynamique', label: 'Votre compréhension des principes de thermodynamique' },
+      { id: 'materiaux', label: 'Votre connaissance des propriétés des matériaux' },
+      { id: 'fabrication', label: 'Votre intérêt pour les procédés de fabrication' }
+    ],
+    civ: [
+      { id: 'structuresGeniesCivil', label: 'Votre compréhension des structures et infrastructures' },
+      { id: 'hydraulique', label: 'Votre connaissance en hydraulique et gestion des eaux' },
+      { id: 'environnement', label: 'Votre sensibilité aux enjeux environnementaux' },
+      { id: 'gestionProjets', label: 'Votre capacité à gérer des projets de construction' }
+    ],
+    ind: [
+      { id: 'optimisationSystemes', label: 'Votre aptitude à optimiser des systèmes complexes' },
+      { id: 'gestionProduction', label: 'Votre compréhension des systèmes de production' },
+      { id: 'ergonomie', label: 'Votre sensibilité à l\'ergonomie et facteurs humains' },
+      { id: 'qualite', label: 'Votre connaissance des méthodes de contrôle de qualité' }
+    ],
+    log: [
+      { id: 'chaineApprovisionnement', label: 'Votre compréhension des chaînes d\'approvisionnement' },
+      { id: 'transportLogistique', label: 'Votre connaissance des systèmes de transport et logistique' },
+      { id: 'gestionStocks', label: 'Votre aptitude à gérer des inventaires et stocks' },
+      { id: 'planificationProduction', label: 'Votre capacité à planifier la production et les ressources' }
+    ]
+  };
+
+  // Noms des programmes pour l'affichage
+  const programmesNoms = {
+    glo: 'Génie logiciel',
+    ele: 'Génie électrique',
+    mec: 'Génie mécanique',
+    civ: 'Génie civil',
+    ind: 'Génie industriel',
+    log: 'Génie logistique'
+  };
 
   const handleCheckboxChange = (event, category) => {
     const { value, checked } = event.target;
@@ -71,6 +162,20 @@ export default function Orientation() {
     }));
   };
 
+  const handleEvaluationChange = (event, programme, questionId) => {
+    const { value } = event.target;
+    setFormData(prev => ({
+      ...prev,
+      evaluationFormations: {
+        ...prev.evaluationFormations,
+        [programme]: {
+          ...prev.evaluationFormations[programme],
+          [questionId]: parseInt(value)
+        }
+      }
+    }));
+  };
+
   const handleSelectChange = (event) => {
     const { name, value } = event.target;
     setFormData(prev => ({
@@ -82,13 +187,55 @@ export default function Orientation() {
   const handleNext = () => setCurrentStep(prev => prev + 1);
   const handlePrev = () => setCurrentStep(prev => prev - 1);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log('Données soumises:', formData);
-    // Ici vous pourriez envoyer les données à votre API
-    // et rediriger vers une page de résultats
+  // Calcul des scores moyens par programme
+  const calculateProgrammeScores = () => {
+    const scores = {};
+
+    for (const programme in formData.evaluationFormations) {
+      const questions = formData.evaluationFormations[programme];
+      let total = 0;
+      let count = 0;
+
+      for (const questionId in questions) {
+        total += questions[questionId];
+        count++;
+      }
+
+      scores[programme] = count > 0 ? total / count : 0;
+    }
+
+    return scores;
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    
+    // Calcul des scores par programme
+    const programmeScores = calculateProgrammeScores();
+    
+    // Préparation des données à envoyer au backend
+    const dataToSend = {
+      ...formData,
+      programmeScores
+    };
+    
+    try {
+      // Envoi des données au backend
+      const response = await axios.post('/api/orientation/resultats', dataToSend);
+      
+      // Redirection vers la page des formations avec indication que l'utilisateur vient de la page d'orientation
+      navigate('/formations', { 
+        state: { 
+          fromOrientation: true
+        } 
+      });
+      
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi des données:', error);
+      alert('Une erreur est survenue lors de la soumission de votre profil. Veuillez réessayer.');
+    }
+  };
+  
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -205,10 +352,168 @@ export default function Orientation() {
             </div>
           </section>
         );
+      case 5:
+        return (
+          <section className="form-section">
+            <h3>Évaluez vos compétences en Génie logiciel</h3>
+            <p>Pour chaque compétence, indiquez votre niveau sur une échelle de 1 à 5</p>
+            {evaluationQuestions.glo.map(question => (
+              <div key={question.id} className="evaluation-item">
+                <div className="evaluation-header">
+                  <label>{question.label}</label>
+                  <span>{formData.evaluationFormations.glo[question.id]}/5</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={formData.evaluationFormations.glo[question.id]}
+                  onChange={(e) => handleEvaluationChange(e, 'glo', question.id)}
+                />
+                <div className="evaluation-labels">
+                  <span>Débutant</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
+      case 6:
+        return (
+          <section className="form-section">
+            <h3>Évaluez vos compétences en Génie électrique</h3>
+            <p>Pour chaque compétence, indiquez votre niveau sur une échelle de 1 à 5</p>
+            {evaluationQuestions.ele.map(question => (
+              <div key={question.id} className="evaluation-item">
+                <div className="evaluation-header">
+                  <label>{question.label}</label>
+                  <span>{formData.evaluationFormations.ele[question.id]}/5</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={formData.evaluationFormations.ele[question.id]}
+                  onChange={(e) => handleEvaluationChange(e, 'ele', question.id)}
+                />
+                <div className="evaluation-labels">
+                  <span>Débutant</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
+      case 7:
+        return (
+          <section className="form-section">
+            <h3>Évaluez vos compétences en Génie mécanique</h3>
+            <p>Pour chaque compétence, indiquez votre niveau sur une échelle de 1 à 5</p>
+            {evaluationQuestions.mec.map(question => (
+              <div key={question.id} className="evaluation-item">
+                <div className="evaluation-header">
+                  <label>{question.label}</label>
+                  <span>{formData.evaluationFormations.mec[question.id]}/5</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={formData.evaluationFormations.mec[question.id]}
+                  onChange={(e) => handleEvaluationChange(e, 'mec', question.id)}
+                />
+                <div className="evaluation-labels">
+                  <span>Débutant</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
+      case 8:
+        return (
+          <section className="form-section">
+            <h3>Évaluez vos compétences en Génie civil</h3>
+            <p>Pour chaque compétence, indiquez votre niveau sur une échelle de 1 à 5</p>
+            {evaluationQuestions.civ.map(question => (
+              <div key={question.id} className="evaluation-item">
+                <div className="evaluation-header">
+                  <label>{question.label}</label>
+                  <span>{formData.evaluationFormations.civ[question.id]}/5</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={formData.evaluationFormations.civ[question.id]}
+                  onChange={(e) => handleEvaluationChange(e, 'civ', question.id)}
+                />
+                <div className="evaluation-labels">
+                  <span>Débutant</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
+      case 9:
+        return (
+          <section className="form-section">
+            <h3>Évaluez vos compétences en Génie industriel</h3>
+            <p>Pour chaque compétence, indiquez votre niveau sur une échelle de 1 à 5</p>
+            {evaluationQuestions.ind.map(question => (
+              <div key={question.id} className="evaluation-item">
+                <div className="evaluation-header">
+                  <label>{question.label}</label>
+                  <span>{formData.evaluationFormations.ind[question.id]}/5</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={formData.evaluationFormations.ind[question.id]}
+                  onChange={(e) => handleEvaluationChange(e, 'ind', question.id)}
+                />
+                <div className="evaluation-labels">
+                  <span>Débutant</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
+      case 10:
+        return (
+          <section className="form-section">
+            <h3>Évaluez vos compétences en Génie logistique</h3>
+            <p>Pour chaque compétence, indiquez votre niveau sur une échelle de 1 à 5</p>
+            {evaluationQuestions.log.map(question => (
+              <div key={question.id} className="evaluation-item">
+                <div className="evaluation-header">
+                  <label>{question.label}</label>
+                  <span>{formData.evaluationFormations.log[question.id]}/5</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={formData.evaluationFormations.log[question.id]}
+                  onChange={(e) => handleEvaluationChange(e, 'log', question.id)}
+                />
+                <div className="evaluation-labels">
+                  <span>Débutant</span>
+                  <span>Expert</span>
+                </div>
+              </div>
+            ))}
+          </section>
+        );
       default:
         return null;
     }
   };
+
+  const totalSteps = 10; // Nombre total d'étapes
 
   return (
     <div className="page-orientation">
@@ -249,10 +554,10 @@ export default function Orientation() {
           
           <form className="formulaire-orientation" onSubmit={handleSubmit}>
             <div className="progress-bar">
-              <div className="progress" style={{ width: `${(currentStep / 4) * 100}%` }}></div>
+              <div className="progress" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
             </div>
 
-            <p className="step-indicator">Étape {currentStep} sur 4</p>
+            <p className="step-indicator">Étape {currentStep} sur {totalSteps}</p>
 
             {renderStep()}
 
@@ -262,7 +567,7 @@ export default function Orientation() {
                   Précédent
                 </button>
               )}
-              {currentStep < 4 ? (
+              {currentStep < totalSteps ? (
                 <button type="button" className="btn-primary" onClick={handleNext}>
                   Suivant
                 </button>
