@@ -59,12 +59,14 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
     }
     public ResultatQuizz getResultatFromRequest(ResultatRequest resultatRequest){
         ResultatQuizz resultatQuizz = new ResultatQuizz();
-        resultatQuizz.setResultatCIV(resultatRequest.getResultatCIV());
         resultatQuizz.setResultatELE(resultatRequest.getResultatELE());
-        resultatQuizz.setResultatGLO(resultatRequest.getResultatGLO());
-        resultatQuizz.setResultatIND(resultatRequest.getResultatIND());
+        resultatQuizz.setResultatGOL(resultatRequest.getResultatGOL());
         resultatQuizz.setResultatLOG(resultatRequest.getResultatLOG());
         resultatQuizz.setResultatMEC(resultatRequest.getResultatMEC());
+        resultatQuizz.setResultatAER(resultatRequest.getResultatAER());
+        resultatQuizz.setResultatCTN(resultatRequest.getResultatCTN());
+        resultatQuizz.setResultatGPA(resultatRequest.getResultatGPA());
+        resultatQuizz.setResultatGTI(resultatRequest.getResultatGTI());
         resultatQuizz.setEmail(resultatRequest.getEmail());
         return resultatQuizz;
     }

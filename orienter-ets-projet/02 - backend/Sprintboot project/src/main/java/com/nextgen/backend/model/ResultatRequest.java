@@ -1,33 +1,22 @@
 package com.nextgen.backend.model;
 
 public class ResultatRequest {
-    private int resultatGLO;
+    private int resultatGOL;
     private int resultatELE;
+
+
+
     private int resultatMEC;
-    private int resultatCIV;
-    private int resultatIND;
     private int resultatLOG;
+    private int resultatAER;
+    private int resultatCTN;
+    private int resultatGPA;
+    private int resultatGTI;
     private String email;
     private String password;
 
     public ResultatRequest(){
 
-    }
-
-    public int getResultatGLO() {
-        return resultatGLO;
-    }
-
-    public void setResultatGLO(int resultatGLO) {
-        this.resultatGLO = resultatGLO;
-    }
-
-    public int getResultatELE() {
-        return resultatELE;
-    }
-
-    public void setResultatELE(int resultatELE) {
-        this.resultatELE = resultatELE;
     }
 
     public int getResultatMEC() {
@@ -38,20 +27,20 @@ public class ResultatRequest {
         this.resultatMEC = resultatMEC;
     }
 
-    public int getResultatCIV() {
-        return resultatCIV;
+    public int getResultatGOL() {
+        return resultatGOL;
     }
 
-    public void setResultatCIV(int resultatCIV) {
-        this.resultatCIV = resultatCIV;
+    public void setResultatGOL(int resultatGOL) {
+        this.resultatGOL = resultatGOL;
     }
 
-    public int getResultatIND() {
-        return resultatIND;
+    public int getResultatELE() {
+        return resultatELE;
     }
 
-    public void setResultatIND(int resultatIND) {
-        this.resultatIND = resultatIND;
+    public void setResultatELE(int resultatELE) {
+        this.resultatELE = resultatELE;
     }
 
     public int getResultatLOG() {
@@ -60,6 +49,38 @@ public class ResultatRequest {
 
     public void setResultatLOG(int resultatLOG) {
         this.resultatLOG = resultatLOG;
+    }
+
+    public int getResultatAER() {
+        return resultatAER;
+    }
+
+    public void setResultatAER(int resultatAER) {
+        this.resultatAER = resultatAER;
+    }
+
+    public int getResultatCTN() {
+        return resultatCTN;
+    }
+
+    public void setResultatCTN(int resultatCTN) {
+        this.resultatCTN = resultatCTN;
+    }
+
+    public int getResultatGPA() {
+        return resultatGPA;
+    }
+
+    public void setResultatGPA(int resultatGPA) {
+        this.resultatGPA = resultatGPA;
+    }
+
+    public int getResultatGTI() {
+        return resultatGTI;
+    }
+
+    public void setResultatGTI(int resultatGTI) {
+        this.resultatGTI = resultatGTI;
     }
 
     public String getEmail() {

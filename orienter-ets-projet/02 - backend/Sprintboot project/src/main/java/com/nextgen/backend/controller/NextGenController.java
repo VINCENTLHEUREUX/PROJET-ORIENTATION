@@ -35,23 +35,27 @@ public class NextGenController {
     public ResponseEntity<?> getResult(@RequestBody ResultatRequest resultatRequest) {
 
         Map<String, Object> response = new HashMap<>();
+        ResultatQuizz resultat =
+                nextGenResultatService.findTopByEmailOrderByTimeDesc(resultatRequest.getEmail());
         User user = nextGenResultatService.getUserFromRequest(resultatRequest);
         if (nextGenUserService.loginUser(user)){
-            ResultatQuizz resultat =
-                    nextGenResultatService.findTopByEmailOrderByTimeDesc(resultatRequest.getEmail());
-            if(resultat == null){
-                response.put("message", "Error: Result not found");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-            }
+
+
 
             response.put("message", "Success");
-            response.put("resultatciv", resultat.getResultatCIV());
+            response.put("resultatctn", resultat.getResultatCTN());
             response.put("resultatele", resultat.getResultatELE());
-            response.put("resultatglo", resultat.getResultatGLO());
-            response.put("resultatind", resultat.getResultatIND());
+            response.put("resultatgol", resultat.getResultatGOL());
+            response.put("resultatgpa", resultat.getResultatGPA());
             response.put("resultatlog", resultat.getResultatLOG());
             response.put("resultatmec", resultat.getResultatMEC());
+            response.put("resultataer", resultat.getResultatAER());
+            response.put("resultatgti", resultat.getResultatGTI());
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        if(resultat == null){
+            response.put("message", "Error: Result not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         response.put("message", "Error: login failed");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);        }
