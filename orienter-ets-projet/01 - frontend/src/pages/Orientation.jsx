@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import "../styles/accueil.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import "../styles/accueil.css"; // pour unifier le style avec les autres pages
 
 const genies = {
   genie_construction: [
@@ -77,7 +79,6 @@ export default function FormulaireOrientation() {
   };
 
   const envoyer = () => {
-  
     setEnvoye(true);
   };
 
@@ -95,74 +96,71 @@ export default function FormulaireOrientation() {
     }
   };
 
-  if (envoye) {
-    return (
-      <div className="page-accueil">
-        <main className="main-content">
-          <div className="welcome-box">
-            <h1 className="welcome-title">Merci !</h1>
-            <p className="welcome-subtitle">
-              Vos réponses ont été soumises avec succès.
-            </p>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   return (
     <div className="page-accueil">
+      <Header />
+
       <main className="main-content">
         <div className="welcome-box">
-          <div className="welcome-header">
-            <h1 className="welcome-title">Formulaire d’orientation</h1>
-            <h2 className="welcome-subtitle">
-              Page {etape + 1} sur {cles.length}
-            </h2>
-          </div>
+          {envoye ? (
+            <>
+              <h1 className="welcome-title">Merci !</h1>
+              <p className="welcome-subtitle">
+                Vos réponses ont été soumises avec succès.
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="welcome-header">
+                <h1 className="welcome-title">Formulaire d’orientation</h1>
+                <h2 className="welcome-subtitle">
+                  Page {etape + 1} sur {cles.length}
+                </h2>
+              </div>
 
-          <form className="formulaire-box">
-            <div className="bloc-questionnaire">
-              {genies[cles[etape]].map((q, idx) => (
-                <div key={idx} className="question-bloc">
-                  <div className="question-numero">
-                    Question {etape * 5 + idx + 1}
-                  </div>
-                  <label className="question-label">{q}</label>
-                  <select
-                    className="question-select"
-                    value={reponses[cles[etape]]?.[idx] || ""}
-                    onChange={(e) =>
-                      handleChange(cles[etape], idx, e.target.value)
-                    }
-                  >
-                    <option value="">Choisir une note</option>
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>
-                        {n}
-                      </option>
-                    ))}
-                  </select>
+              <form className="formulaire-box">
+                <div className="bloc-questionnaire">
+                  {genies[cles[etape]].map((q, idx) => (
+                    <div key={idx} className="question-bloc">
+                      <div className="question-numero">
+                        Question {etape * 5 + idx + 1}
+                      </div>
+                      <label className="question-label">{q}</label>
+                      <select
+                        className="question-select"
+                        value={reponses[cles[etape]]?.[idx] || ""}
+                        onChange={(e) =>
+                          handleChange(cles[etape], idx, e.target.value)
+                        }
+                      >
+                        <option value="">Choisir une note</option>
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <option key={n} value={n}>
+                            {n}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </form>
+              </form>
 
-          <div
-            className="submit-box"
-            style={{ display: "flex", justifyContent: "space-between" }}
-          >
-            {etape > 0 && (
-              <button onClick={precedent} className="submit-button">
-                Précédent
-              </button>
-            )}
-            <button onClick={suivant} className="submit-button">
-              {etape < cles.length - 1 ? "Suivant" : "Terminer"}
-            </button>
-          </div>
+              <div className="submit-box">
+                {etape > 0 && (
+                  <button onClick={precedent} className="submit-button">
+                    Précédent
+                  </button>
+                )}
+                <button onClick={suivant} className="submit-button">
+                  {etape < cles.length - 1 ? "Suivant" : "Terminer"}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
