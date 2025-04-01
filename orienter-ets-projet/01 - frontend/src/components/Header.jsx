@@ -1,47 +1,55 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Header = () => (
-  <header className="bg-white shadow-md">
-    <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-      <Link to="/">
-        <img
-          src="ETS-rouge-impr-fond_transparent.png"
-          alt="Logo ÉTS"
-          className="h-12"
-        />
-      </Link>
-      <div className="flex items-center space-x-4">
-        <Link to="/" className="text-ets-red hover:text-ets-darkred font-medium">
-          Accueil
-        </Link>
-        <Link to="/connexion" className="text-ets-red hover:text-ets-darkred font-medium">
-          Connexion
-        </Link>
-        <Link to="/inscription" className="text-ets-red hover:text-ets-darkred font-medium">
-          Inscription
-        </Link>
-        <link to="/orientation" ClassName="text-ets-red hover:text-ets-darkred font-medium">
-          Quiz d'orientation
-        </link>
-        <link to="/formation" ClassName="text-ets-red hover:text-ets-darkred font-medium">
-          Formations
-        </link>
-      </div>
-    </div>
-    <nav className="bg-ets-red">
-      <div className="container mx-auto px-4">
-        <ul className="flex overflow-x-auto whitespace-nowrap">
-          <li><Link to="/" className="text-white px-4 py-3 inline-block hover:bg-ets-darkred">Accueil</Link></li>
-          <li><a href="#" className="text-white px-4 py-3 inline-block hover:bg-ets-darkred">Premier cycle</a></li>
-          <li><a href="#" className="text-white px-4 py-3 inline-block hover:bg-ets-darkred">Cycles supérieurs</a></li>
-          <li><a href="#" className="text-white px-4 py-3 inline-block hover:bg-ets-darkred">Certificats</a></li>
-          <li><a href="#" className="text-white px-4 py-3 inline-block hover:bg-ets-darkred">Formation continue</a></li>
-        </ul>
-      </div>
-    </nav>
-  </header>
-);
+const Header = () => {
+  const leftLinks = [
+    { to: '/', label: 'Accueil' },
+    { to: '#', label: 'Profil' },
+    { to: '#', label: 'Programmes' },
+    { to: '/formulaire', label: 'Questionnaire' }, 
+  ];
+  
+
+  const rightLinks = [
+    { to: '/connexion', label: 'Connexion' },
+    { to: '/inscription', label: 'Inscription' },
+  ];
+
+  return (
+    <header className="shadow-md">
+      <nav className="bg-[#b91c1c]">
+        <div className="max-w-[1200px] mx-auto px-4 py-3 flex justify-between items-center">
+          {}
+          <ul className="flex flex-wrap gap-2">
+            {leftLinks.map(({ to, label }, index) => (
+              <li key={index}>
+                <Link
+                  to={to}
+                  className="text-white px-4 py-2 inline-block hover:bg-[#7f1d1d] transition-colors duration-300 font-medium"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {}
+          <ul className="flex gap-2">
+            {rightLinks.map(({ to, label }, index) => (
+              <li key={index}>
+                <Link
+                  to={to}
+                  className="text-white px-4 py-2 inline-block hover:bg-[#7f1d1d] transition-colors duration-300 font-medium"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+    </header>
+  );
+};
 
 export default Header;
