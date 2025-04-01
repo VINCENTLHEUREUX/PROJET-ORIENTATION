@@ -5,71 +5,14 @@ import Footer from '../components/Footer';
 import axios from 'axios';
 import '../styles/formations.css';
 
-// Données des formations (baccalauréats)
-const formations = [
-  {
-    id: 'glo',
-    titre: 'Génie logiciel',
-    code: 'GLO',
-    description: 'Formation complète en conception, développement et maintenance de systèmes logiciels complexes.',
-    duree: '4 ans',
-    credits: '120 crédits',
-    url: 'https://www.etsmtl.ca/programmes/baccalaureat/genie-logiciel'
-  },
-  {
-    id: 'ele',
-    titre: 'Génie électrique',
-    code: 'ELE',
-    description: 'Programme couvrant les systèmes électriques, électroniques et les technologies de l\'information.',
-    duree: '4 ans',
-    credits: '120 crédits',
-    url: 'https://www.etsmtl.ca/programmes/baccalaureat/genie-electrique'
-  },
-  {
-    id: 'mec',
-    titre: 'Génie mécanique',
-    code: 'MEC',
-    description: 'Formation en conception et analyse de systèmes mécaniques et thermodynamiques.',
-    duree: '4 ans',
-    credits: '120 crédits',
-    url: 'https://www.etsmtl.ca/programmes/baccalaureat/genie-mecanique'
-  },
-  {
-    id: 'civ',
-    titre: 'Génie civil',
-    code: 'CIV',
-    description: 'Programme axé sur la conception, la construction et la gestion des infrastructures.',
-    duree: '4 ans',
-    credits: '120 crédits',
-    url: 'https://www.etsmtl.ca/programmes/baccalaureat/genie-civil'
-  },
-  {
-    id: 'ind',
-    titre: 'Génie industriel',
-    code: 'IND',
-    description: 'Optimisation des systèmes de production et des processus industriels.',
-    duree: '4 ans',
-    credits: '120 crédits',
-    url: 'https://www.etsmtl.ca/programmes/baccalaureat/genie-industriel'
-  },
-  {
-    id: 'log',
-    titre: 'Génie logistique',
-    code: 'LOG',
-    description: 'Gestion des chaînes d\'approvisionnement et optimisation des flux logistiques.',
-    duree: '4 ans',
-    credits: '120 crédits',
-    url: 'https://www.etsmtl.ca/programmes/baccalaureat/genie-logistique'
-  }
-];
-
 export default function Formations() {
+  const [formations, setFormations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('tous');
-  const [sortedFormations, setSortedFormations] = useState([...formations]);
+  const [sortedFormations, setSortedFormations] = useState([]);
   const [orientationResults, setOrientationResults] = useState(null);
   const [showResults, setShowResults] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const location = useLocation();
@@ -77,41 +20,59 @@ export default function Formations() {
   // Vérifie si l'utilisateur vient de la page d'orientation
   const fromOrientation = location.state?.fromOrientation || false;
 
-  // Récupérer les résultats du test d'orientation depuis le backend lors du chargement
+  // Récupérer les formations et les résultats du test d'orientation lors du chargement
   useEffect(() => {
-    const fetchOrientationResults = async () => {
-      // Si l'utilisateur vient de terminer le test d'orientation
-      if (fromOrientation) {
-        setLoading(true);
-        setError(null);
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Récupérer la liste des baccalauréats depuis le backend
+        const formationsResponse = await axios.get('/api/formations');
         
-        try {
-          // Récupérer les résultats du backend
-          const response = await axios.get('/api/orientation/resultats');
+        if (formationsResponse.data) {
+          setFormations(formationsResponse.data);
           
-          if (response.data && response.data.scores) {
-            setOrientationResults(response.data);
-            setShowResults(true);
-            
-            // Trier les formations en fonction des scores
-            const sortedByScore = [...formations].sort((a, b) => {
-              const scoreA = response.data.scores[a.id] || 0;
-              const scoreB = response.data.scores[b.id] || 0;
-              return scoreB - scoreA; // Tri décroissant par score
-            });
-            
-            setSortedFormations(sortedByScore);
+          // Par défaut, sans résultats d'orientation, on affiche les formations dans l'ordre reçu
+          setSortedFormations(formationsResponse.data);
+          
+          // Vérifier si l'utilisateur a déjà fait le test d'orientation
+          const userStatusResponse = await axios.get('/api/user/orientation-status');
+          
+          // Si l'utilisateur vient de terminer le test ou a déjà fait le test
+          if (fromOrientation || (userStatusResponse.data && userStatusResponse.data.hasCompletedOrientation)) {
+            try {
+              // Récupérer les résultats du test d'orientation
+              const orientationResponse = await axios.get('/api/orientation/resultats');
+              
+              if (orientationResponse.data && orientationResponse.data.scores) {
+                setOrientationResults(orientationResponse.data);
+                setShowResults(true);
+                
+                // Trier les formations en fonction des scores
+                const sortedByScore = [...formationsResponse.data].sort((a, b) => {
+                  const scoreA = orientationResponse.data.scores[a.id] || 0;
+                  const scoreB = orientationResponse.data.scores[b.id] || 0;
+                  return scoreB - scoreA; // Tri décroissant par score
+                });
+                
+                setSortedFormations(sortedByScore);
+              }
+            } catch (orientationErr) {
+              console.error('Erreur lors de la récupération des résultats d\'orientation:', orientationErr);
+              // Si erreur avec l'orientation, on garde l'ordre par défaut des formations
+            }
           }
-        } catch (err) {
-          console.error('Erreur lors de la récupération des résultats:', err);
-          setError('Impossible de récupérer vos résultats d\'orientation. Veuillez réessayer.');
-        } finally {
-          setLoading(false);
         }
+      } catch (err) {
+        console.error('Erreur lors de la récupération des données:', err);
+        setError('Impossible de récupérer les informations. Veuillez réessayer plus tard.');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchOrientationResults();
+    fetchData();
   }, [fromOrientation]);
 
   // Filtrer les formations en fonction de la recherche et du filtre
@@ -124,6 +85,7 @@ export default function Formations() {
 
   // Réinitialiser le tri des formations
   const resetSort = () => {
+    // Récupérer à nouveau les formations sans tri par orientation
     setSortedFormations([...formations]);
     setShowResults(false);
   };
@@ -143,6 +105,16 @@ export default function Formations() {
     if (!orientationResults || !showResults) return null;
     const score = orientationResults.scores[formationId] || 0;
     return Math.round((score / 5) * 100); // Convertir le score sur 5 en pourcentage
+  };
+
+  // Génération dynamique des options de filtre basée sur les formations disponibles
+  const generateFilterOptions = () => {
+    return [
+      <option key="tous" value="tous">Tous les programmes</option>,
+      ...formations.map(formation => (
+        <option key={formation.id} value={formation.id}>{formation.titre}</option>
+      ))
+    ];
   };
 
   return (
@@ -181,7 +153,7 @@ export default function Formations() {
           {/* Affichage du chargement */}
           {loading && (
             <div className="loading-indicator">
-              <p>Chargement des résultats de votre test d'orientation...</p>
+              <p>Chargement des programmes de formation...</p>
             </div>
           )}
           
@@ -207,73 +179,71 @@ export default function Formations() {
           )}
           
           {/* Barre de recherche et filtres */}
-          <div className="search-filter-container">
-            <div className="search-bar">
-              <input
-                type="text"
-                placeholder="Rechercher une formation..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="filter-options">
-              <label>Filtrer par :</label>
-              <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-                <option value="tous">Tous les programmes</option>
-                <option value="glo">Génie logiciel</option>
-                <option value="ele">Génie électrique</option>
-                <option value="mec">Génie mécanique</option>
-                <option value="civ">Génie civil</option>
-                <option value="ind">Génie industriel</option>
-                <option value="log">Génie logistique</option>
-              </select>
-            </div>
-            {!showResults && !loading && (
-              <div className="orientation-cta">
-                <Link to="/orientation" className="btn-primary">Faire le test d'orientation</Link>
+          {!loading && !error && (
+            <div className="search-filter-container">
+              <div className="search-bar">
+                <input
+                  type="text"
+                  placeholder="Rechercher une formation..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-            )}
-          </div>
+              <div className="filter-options">
+                <label>Filtrer par :</label>
+                <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                  {generateFilterOptions()}
+                </select>
+              </div>
+              {!showResults && (
+                <div className="orientation-cta">
+                  <Link to="/orientation" className="btn-primary">Faire le test d'orientation</Link>
+                </div>
+              )}
+            </div>
+          )}
           
           {/* Liste des formations */}
-          <div className="formations-list">
-            {filteredFormations.length > 0 ? (
-              filteredFormations.map((formation) => (
-                <div key={formation.id} className={`formation-card ${getCompatibilityClass(formation.id)}`}>
-                  <div className="formation-header">
-                    <h2>{formation.titre}</h2>
-                    <span className="formation-code">{formation.code}</span>
-                  </div>
-                  <div className="formation-content">
-                    <p className="formation-description">{formation.description}</p>
-                    <div className="formation-details">
-                      <span><strong>Durée:</strong> {formation.duree}</span>
-                      <span><strong>Crédits:</strong> {formation.credits}</span>
+          {!loading && !error && (
+            <div className="formations-list">
+              {filteredFormations.length > 0 ? (
+                filteredFormations.map((formation) => (
+                  <div key={formation.id} className={`formation-card ${getCompatibilityClass(formation.id)}`}>
+                    <div className="formation-header">
+                      <h2>{formation.titre}</h2>
+                      <span className="formation-code">{formation.code}</span>
                     </div>
-                    {showResults && (
-                      <div className="compatibility-indicator">
-                        <div className="compatibility-bar">
-                          <div 
-                            className="compatibility-fill" 
-                            style={{width: `${getCompatibilityPercentage(formation.id)}%`}}
-                          ></div>
-                        </div>
-                        <span className="compatibility-percentage">{getCompatibilityPercentage(formation.id)}% de compatibilité</span>
+                    <div className="formation-content">
+                      <p className="formation-description">{formation.description}</p>
+                      <div className="formation-details">
+                        <span><strong>Durée:</strong> {formation.duree}</span>
+                        <span><strong>Crédits:</strong> {formation.credits}</span>
                       </div>
-                    )}
+                      {showResults && (
+                        <div className="compatibility-indicator">
+                          <div className="compatibility-bar">
+                            <div 
+                              className="compatibility-fill" 
+                              style={{width: `${getCompatibilityPercentage(formation.id)}%`}}
+                            ></div>
+                          </div>
+                          <span className="compatibility-percentage">{getCompatibilityPercentage(formation.id)}% de compatibilité</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="formation-actions">
+                      <a href={formation.url} target="_blank" rel="noopener noreferrer" className="btn-secondary">En savoir plus</a>
+                      <Link to={`/admission/${formation.id}`} className="btn-primary">Postuler</Link>
+                    </div>
                   </div>
-                  <div className="formation-actions">
-                    <a href={formation.url} target="_blank" rel="noopener noreferrer" className="btn-secondary">En savoir plus</a>
-                    <Link to={`/admission/${formation.id}`} className="btn-primary">Postuler</Link>
-                  </div>
+                ))
+              ) : (
+                <div className="no-results">
+                  <p>Aucune formation ne correspond à votre recherche.</p>
                 </div>
-              ))
-            ) : (
-              <div className="no-results">
-                <p>Aucune formation ne correspond à votre recherche.</p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
 
