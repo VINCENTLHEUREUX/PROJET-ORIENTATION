@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../styles/orientation.css"; // pour unifier le style avec les autres pages
+import { useNavigate } from "react-router-dom";
+import "../styles/orientation.css";
 
 const genies = {
   genie_construction: [
@@ -63,6 +64,7 @@ const genies = {
 };
 
 export default function FormulaireOrientation() {
+  const navigate = useNavigate();
   const cles = Object.keys(genies);
   const [etape, setEtape] = useState(0);
   const [reponses, setReponses] = useState({});
@@ -70,6 +72,7 @@ export default function FormulaireOrientation() {
   const [resultats, setResultats] = useState(null);
   const [erreur, setErreur] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countdown, setCountdown] = useState(null);
 
   const handleChange = (genie, index, value) => {
     setReponses((prev) => ({
@@ -81,7 +84,6 @@ export default function FormulaireOrientation() {
     }));
   };
 
-  // Calculer le score total pour chaque type de génie
   const calculerResultats = () => {
     const resultats = {};
     
@@ -98,12 +100,10 @@ export default function FormulaireOrientation() {
     setIsSubmitting(true);
     setErreur("");
     
-    // Calculer les résultats finaux
     const scoresFinals = calculerResultats();
     setResultats(scoresFinals);
     
     try {
-      // Envoyer les résultats au backend
       const response = await fetch('/api/orientation-resultats', {
         method: 'POST',
         headers: {
@@ -121,6 +121,26 @@ export default function FormulaireOrientation() {
       }
       
       setEnvoye(true);
+      setCountdown(5);
+      
+      const timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            navigate('/formations', { 
+              state: { 
+                fromOrientation: true,
+                orientationResults: {
+                  scores: scoresFinals
+                }
+              } 
+            });
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
     } catch (error) {
       console.error('Erreur:', error);
       setErreur("Une erreur s'est produite lors de l'envoi des résultats. Veuillez réessayer.");
@@ -130,7 +150,6 @@ export default function FormulaireOrientation() {
   };
 
   const suivant = () => {
-    // Vérifier si toutes les questions de l'étape actuelle ont été répondues
     const reponseEtapeActuelle = reponses[cles[etape]] || {};
     const toutesRepondues = genies[cles[etape]].every((_, idx) => 
       reponseEtapeActuelle[idx] !== undefined && reponseEtapeActuelle[idx] !== ""
@@ -156,7 +175,17 @@ export default function FormulaireOrientation() {
     }
   };
 
-  // Trouver le génie avec le score le plus élevé
+  const allerAuxFormations = () => {
+    navigate('/formations', { 
+      state: { 
+        fromOrientation: true,
+        orientationResults: {
+          scores: resultats
+        }
+      } 
+    });
+  };
+
   const getGenieRecommande = () => {
     if (!resultats) return null;
     
@@ -173,7 +202,6 @@ export default function FormulaireOrientation() {
     return genieRecommande.replace('_', ' ');
   };
 
-  // Convertir les noms de génie pour l'affichage
   const formatNomGenie = (nom) => {
     return nom.replace('genie_', 'Génie ').replace(/_/g, ' ');
   };
@@ -212,6 +240,18 @@ export default function FormulaireOrientation() {
                     <div className="programme-recommande">
                       {formatNomGenie(getGenieRecommande())}
                     </div>
+                  </div>
+                  
+                  <div className="redirection-box">
+                    {countdown !== null ? (
+                      <p className="redirection-message">
+                        Vous serez redirigé vers la page des formations dans {countdown} secondes...
+                      </p>
+                    ) : (
+                      <button onClick={allerAuxFormations} className="submit-button">
+                        Voir les formations recommandées
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
