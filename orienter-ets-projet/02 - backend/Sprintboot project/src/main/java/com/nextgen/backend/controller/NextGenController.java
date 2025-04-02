@@ -1,10 +1,12 @@
 package com.nextgen.backend.controller;
 
+import com.nextgen.backend.model.ProgramInfo;
 import com.nextgen.backend.model.ResultatQuizz;
 import com.nextgen.backend.model.ResultatRequest;
 import com.nextgen.backend.model.User;
 import com.nextgen.backend.repository.NextGenResultatRepository;
 import com.nextgen.backend.repository.NextGenUserRepository;
+import com.nextgen.backend.service.NextGenProgramsService;
 import com.nextgen.backend.service.NextGenResultatService;
 import com.nextgen.backend.service.NextGenUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +24,15 @@ public class NextGenController {
 
     private final NextGenUserService nextGenUserService;
     private final NextGenResultatService nextGenResultatService;
-
+    private final NextGenProgramsService nextGenProgramsService;
 
     @Autowired
     public NextGenController(NextGenUserService nextGenUserService,
-                             NextGenResultatService nextGenResultatService) {
+                             NextGenResultatService nextGenResultatService,
+                             NextGenProgramsService nextGenProgramsService) {
         this.nextGenUserService = nextGenUserService;
         this.nextGenResultatService = nextGenResultatService;
+        this.nextGenProgramsService = nextGenProgramsService;
     }
 
     @PostMapping("/results")
@@ -145,7 +149,6 @@ public class NextGenController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 
     }
-/*
     @GetMapping("/program")
     public ResponseEntity<?> getProgram(@RequestParam String sigle) {
         Map<String, Object> response = new HashMap<>();
@@ -214,5 +217,4 @@ public class NextGenController {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
- */
 }
