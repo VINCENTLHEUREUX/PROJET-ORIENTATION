@@ -79,12 +79,7 @@
 }
 
 .orientation-container {
-  max-width: 900px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  padding: 2.5rem;
+  @apply max-w-3xl mx-auto bg-white rounded-lg shadow-card p-8;
 }
 
 .orientation-container h1 {
@@ -105,25 +100,36 @@
   margin-top: 1.5rem;
 }
 
+.question-grid {
+  @apply grid gap-4;
+}
+
+.question-item {
+  @apply p-4 border rounded-lg hover:border-ets-red transition-colors;
+}
+
+.rating-group {
+  @apply flex items-center gap-4 mt-2;
+}
+
+.rating-option {
+  @apply flex items-center gap-2;
+}
+
+.rating-label {
+  @apply text-sm text-gray-600;
+}
+
 .progress-bar {
-  height: 6px;
-  background-color: #e0e0e0;
-  border-radius: 3px;
-  margin-bottom: 1.5rem;
-  overflow: hidden;
+  @apply w-full h-2 bg-gray-200 rounded-full overflow-hidden mt-8 mb-4;
 }
 
-.progress {
-  height: 100%;
-  background-color: #d32f2f;
-  transition: width 0.3s ease;
+.progress-fill {
+  @apply h-full bg-ets-red transition-all duration-300;
 }
 
-.step-indicator {
-  color: #666;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+.form-navigation {
+  @apply flex justify-between mt-8;
 }
 
 .form-section {
@@ -378,7 +384,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
   
   .orientation-container {
-    padding: 1.5rem;
+    @apply p-4;
   }
   
   .checkbox-grid {
@@ -386,8 +392,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
   
   .form-navigation {
-    flex-direction: column;
-    gap: 1rem;
+    @apply flex-col gap-4;
   }
   
   .btn-primary,
@@ -395,3 +400,119 @@ input[type="range"]::-webkit-slider-thumb:hover {
     width: 100%;
   }
 }
+
+/* Quiz Specific Styles */
+.quiz-container {
+  @apply max-w-3xl mx-auto bg-white rounded-lg shadow-card p-8;
+}
+
+.quiz-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.quiz-header h1 {
+  @apply text-2xl font-bold text-ets-red mb-4;
+}
+
+.quiz-header p {
+  @apply text-gray-600 text-lg;
+}
+
+.question-section {
+  @apply bg-white rounded-lg p-6 mb-6 border border-gray-200;
+}
+
+.question-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.question-number {
+  @apply text-ets-red font-semibold text-lg;
+}
+
+.question-text {
+  @apply text-gray-800 text-lg mb-4;
+}
+
+.answer-options {
+  @apply space-y-3;
+}
+
+.answer-option {
+  @apply flex items-center gap-2 p-3 rounded-lg border border-gray-200 hover:border-ets-red transition-colors cursor-pointer;
+}
+
+.answer-option.selected {
+  @apply border-ets-red bg-red-50;
+}
+
+.answer-value {
+  @apply font-medium text-gray-700;
+}
+
+.progress-container {
+  @apply mt-8;
+}
+
+.progress-bar {
+  @apply w-full h-2 bg-gray-200 rounded-full overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-ets-red transition-all duration-300;
+}
+
+.progress-text {
+  @apply text-sm text-gray-600 mt-2 text-center;
+}
+
+.navigation-buttons {
+  @apply flex justify-between mt-8 gap-4;
+}
+
+.nav-button {
+  @apply px-6 py-2 rounded-lg font-medium transition-colors;
+}
+
+.button-previous {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+}
+
+.button-next {
+  @apply bg-ets-red text-white hover:bg-ets-darkred;
+}
+
+.results-container {
+  @apply bg-white rounded-lg shadow-card p-8 max-w-3xl mx-auto;
+}
+
+.results-header {
+  @apply text-center mb-8;
+}
+
+.results-list {
+  @apply space-y-4;
+}
+
+.result-item {
+  @apply flex justify-between items-center p-4 border rounded-lg hover:border-ets-red transition-colors;
+}
+
+.program-name {
+  @apply font-medium text-gray-800;
+}
+
+.program-score {
+  @apply text-ets-red font-semibold;
+}
+
+.recommendation-section {
+  @apply mt-8 p-6 bg-red-50 rounded-lg border border-ets-red;
+}
+
+.error-message {
+  @apply text-red-600 text-center mt-4;
+}
+
+
