@@ -104,16 +104,17 @@ export default function FormulaireOrientation() {
     setResultats(scoresFinals);
     
     try {
-      const response = await fetch('/api/orientation-resultats', {
+      const response = await fetch('/api/results', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
         body: JSON.stringify({
           reponses: reponses,
           resultats: scoresFinals,
           date: new Date().toISOString()
-        }),
+        })
       });
       
       if (!response.ok) {
@@ -140,11 +141,8 @@ export default function FormulaireOrientation() {
           return prev - 1;
         });
       }, 1000);
-      
     } catch (error) {
-      console.error('Erreur:', error);
-      setErreur("Une erreur s'est produite lors de l'envoi des résultats. Veuillez réessayer.");
-    } finally {
+      setErreur(error.message || "Une erreur est survenue");
       setIsSubmitting(false);
     }
   };
@@ -207,119 +205,147 @@ export default function FormulaireOrientation() {
   };
 
   return (
-    <div className="page-accueil">
+    <div className="page-orientation">
       <Header />
-
       <main className="main-content">
-        <div className="welcome-box">
-          {envoye ? (
-            <>
-              <h1 className="welcome-title">Merci pour vos réponses !</h1>
-              <p className="welcome-subtitle">
-                Vos résultats ont été soumis avec succès.
-              </p>
+        {!envoye ? (
+          <div className="quiz-container">
+            <div className="quiz-header">
+              <h1>Questionnaire d'orientation</h1>
+              <p>Découvrez le programme qui vous correspond le mieux</p>
+            </div>
+
+            <div className="question-section">
+              <div className="question-header">
+                <span className="question-number">
+                  Section {etape + 1} sur {cles.length}
+                </span>
+              </div>
               
-              {resultats && (
-                <div className="resultats-box">
-                  <h2>Vos scores par programme</h2>
-                  <ul className="resultats-liste">
-                    {Object.entries(resultats)
-                      .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
-                      .map(([genie, score]) => (
-                        <li key={genie} className="resultat-item">
-                          <span className="nom-genie">{formatNomGenie(genie)}:</span>
-                          <span className="score-genie">{score} points</span>
-                        </li>
-                      ))
-                    }
-                  </ul>
-                  
-                  <div className="recommendation-box">
-                    <h3>Programme recommandé</h3>
-                    <p>Selon vos réponses, le programme qui pourrait vous convenir le mieux est:</p>
-                    <div className="programme-recommande">
-                      {formatNomGenie(getGenieRecommande())}
-                    </div>
-                  </div>
-                  
-                  <div className="redirection-box">
-                    {countdown !== null ? (
-                      <p className="redirection-message">
-                        Vous serez redirigé vers la page des formations dans {countdown} secondes...
-                      </p>
-                    ) : (
-                      <button onClick={allerAuxFormations} className="submit-button">
-                        Voir les formations recommandées
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              <div className="welcome-header">
-                <h1 className="welcome-title">Formulaire d'orientation</h1>
-                <h2 className="welcome-subtitle">
-                  Page {etape + 1} sur {cles.length}
-                </h2>
-              </div>
+              <h3 className="text-xl font-semibold mb-6">
+                {formatNomGenie(cles[etape])}
+              </h3>
 
-              <form className="formulaire-box">
-                <h3 className="categorie-titre">{formatNomGenie(cles[etape])}</h3>
-                <div className="bloc-questionnaire">
-                  {genies[cles[etape]].map((q, idx) => (
-                    <div key={idx} className="question-bloc">
-                      <div className="question-numero">
-                        Question {etape * 5 + idx + 1}
-                      </div>
-                      <label className="question-label">{q}</label>
-                      <select
-                        className="question-select"
-                        value={reponses[cles[etape]]?.[idx] || ""}
-                        onChange={(e) =>
-                          handleChange(cles[etape], idx, e.target.value)
-                        }
-                        required
+              {genies[cles[etape]].map((q, idx) => (
+                <div key={idx} className="mb-6">
+                  <p className="question-text">
+                    {etape * 5 + idx + 1}. {q}
+                  </p>
+                  <div className="answer-options">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <label
+                        key={n}
+                        className={`answer-option ${
+                          reponses[cles[etape]]?.[idx] === n ? 'selected' : ''
+                        }`}
                       >
-                        <option value="">Choisir une note</option>
-                        {[1, 2, 3, 4, 5].map((n) => (
-                          <option key={n} value={n}>
-                            {n} - {n === 1 ? "Pas du tout" : n === 5 ? "Tout à fait" : ""}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ))}
+                        <input
+                          type="radio"
+                          name={`question-${idx}`}
+                          value={n}
+                          checked={reponses[cles[etape]]?.[idx] === n}
+                          onChange={(e) =>
+                            handleChange(cles[etape], idx, e.target.value)
+                          }
+                          className="hidden"
+                        />
+                        <span className="answer-value">
+                          {n} - {n === 1 ? "Pas du tout d'accord" : 
+                               n === 2 ? "Plutôt pas d'accord" :
+                               n === 3 ? "Neutre" :
+                               n === 4 ? "Plutôt d'accord" :
+                               "Tout à fait d'accord"}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </form>
+              ))}
 
-              {erreur && <div className="erreur-message">{erreur}</div>}
+              {erreur && <div className="error-message">{erreur}</div>}
 
-              <div className="progression-bar">
-                <div 
-                  className="progression-complete" 
-                  style={{width: `${(etape / (cles.length - 1)) * 100}%`}}
-                ></div>
+              <div className="progress-container">
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${((etape + 1) / cles.length) * 100}%` }}
+                  />
+                </div>
+                <p className="progress-text">
+                  {Math.round(((etape + 1) / cles.length) * 100)}% complété
+                </p>
               </div>
 
-              <div className="submit-box">
+              <div className="navigation-buttons">
                 {etape > 0 && (
-                  <button onClick={precedent} className="submit-button" disabled={isSubmitting}>
+                  <button
+                    onClick={precedent}
+                    className="nav-button button-previous"
+                    disabled={isSubmitting}
+                  >
                     Précédent
                   </button>
                 )}
-                <button onClick={suivant} className="submit-button" disabled={isSubmitting}>
+                <button
+                  onClick={suivant}
+                  className="nav-button button-next"
+                  disabled={isSubmitting}
+                >
                   {etape < cles.length - 1 ? "Suivant" : "Terminer"}
-                  {isSubmitting && " ..."}
+                  {isSubmitting && "..."}
                 </button>
               </div>
-            </>
-          )}
-        </div>
-      </main>
+            </div>
+          </div>
+        ) : (
+          <div className="results-container">
+            <div className="results-header">
+              <h1 className="text-2xl font-bold text-ets-red mb-2">
+                Résultats de votre orientation
+              </h1>
+              <p className="text-gray-600">
+                Voici les programmes qui correspondent le mieux à votre profil
+              </p>
+            </div>
 
+            <div className="results-list">
+              {Object.entries(resultats)
+                .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+                .map(([genie, score]) => (
+                  <div key={genie} className="result-item">
+                    <span className="program-name">{formatNomGenie(genie)}</span>
+                    <span className="program-score">{score} points</span>
+                  </div>
+                ))}
+            </div>
+
+            <div className="recommendation-section">
+              <h3 className="text-lg font-semibold mb-2">
+                Programme recommandé
+              </h3>
+              <p className="mb-4">
+                Selon vos réponses, le programme qui pourrait vous convenir le mieux est :
+              </p>
+              <div className="text-xl font-bold text-ets-red">
+                {formatNomGenie(getGenieRecommande())}
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                onClick={allerAuxFormations}
+                className="nav-button button-next"
+              >
+                Voir les détails des formations
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
       <Footer />
     </div>
   );
 }
+
+
+
