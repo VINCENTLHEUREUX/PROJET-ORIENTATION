@@ -132,6 +132,11 @@
   @apply flex justify-between mt-8;
 }
 
+.question-text {
+  @apply text-gray-800 text-lg font-bold mb-4;
+}
+
+
 .form-section {
   margin-bottom: 2.5rem;
 }
