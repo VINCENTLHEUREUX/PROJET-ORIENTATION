@@ -2,29 +2,54 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
+  const leftLinks = [
+    { to: '/', label: 'Accueil' },
+    { to: '#', label: 'Profil' },
+    { to: '#', label: 'Programmes' },
+    { to: '/formulaire', label: 'Orientation' }, 
+  ];
+  
+
+  const rightLinks = [
+    { to: '/connexion', label: 'Connexion' },
+    { to: '/inscription', label: 'Inscription' },
+  ];
+
   return (
-    <header className="header">
-      <div className="header-container">
-        <Link to="/">
-          <img src="/ETS-rouge-impr-fond_transparent.png" alt="Logo ÉTS" className="logo-ets" />
-        </Link>
-        <div className="header-links">
-          <Link to="/connexion" className="link-ets">Connexion</Link>
-          <Link to="/inscription" className="link-ets">Inscription</Link>
+    <header className="shadow-md">
+      <nav className="bg-[#b91c1c]">
+        <div className="max-w-[1200px] mx-auto px-4 py-3 flex justify-between items-center">
+          {}
+          <ul className="flex flex-wrap gap-2">
+            {leftLinks.map(({ to, label }, index) => (
+              <li key={index}>
+                <Link
+                  to={to}
+                  className="text-white px-4 py-2 inline-block hover:bg-[#7f1d1d] transition-colors duration-300 font-medium"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {}
+          <ul className="flex gap-2">
+            {rightLinks.map(({ to, label }, index) => (
+              <li key={index}>
+                <Link
+                  to={to}
+                  className="text-white px-4 py-2 inline-block hover:bg-[#7f1d1d] transition-colors duration-300 font-medium"
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
-      <nav className="nav-bar">
-        <ul className="nav-list">
-          <li><Link to="/" className="nav-item">Accueil</Link></li>
-          <li><Link to="/orientation" className="nav-item">Orientation</Link></li>
-          <li><Link to="/formations" className="nav-item">Formations</Link></li>
-        </ul>
       </nav>
     </header>
   );
 };
 
 export default Header;
-
-
-
