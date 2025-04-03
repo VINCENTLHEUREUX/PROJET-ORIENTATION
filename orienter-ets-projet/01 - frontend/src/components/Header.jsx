@@ -4,11 +4,10 @@ import { Link } from 'react-router-dom';
 const Header = () => {
   const leftLinks = [
     { to: '/', label: 'Accueil' },
-    { to: '#', label: 'Profil' },
-    { to: '#', label: 'Programmes' },
-    { to: '/formulaire', label: 'Orientation' }, 
+    { to: '/profil', label: 'Profil' },
+    { to: '/formations', label: 'Programmes' },
+    { to: '/orientation', label: 'Orientation' },
   ];
-  
 
   const rightLinks = [
     { to: '/connexion', label: 'Connexion' },
@@ -19,7 +18,7 @@ const Header = () => {
     <header className="shadow-md">
       <nav className="bg-[#b91c1c]">
         <div className="max-w-[1200px] mx-auto px-4 py-3 flex justify-between items-center">
-          {}
+          {/* Liens de gauche */}
           <ul className="flex flex-wrap gap-2">
             {leftLinks.map(({ to, label }, index) => (
               <li key={index}>
@@ -33,7 +32,7 @@ const Header = () => {
             ))}
           </ul>
 
-          {}
+          {/* Liens de droite */}
           <ul className="flex gap-2">
             {rightLinks.map(({ to, label }, index) => (
               <li key={index}>
