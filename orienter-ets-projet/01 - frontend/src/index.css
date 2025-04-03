@@ -1,3 +1,111 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-800 min-h-screen;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply min-h-screen flex flex-col bg-gray-50 font-sans;
+  }
+
+  .main-container {
+    @apply flex-1 px-4 py-8;
+  }
+
+  .content-wrapper {
+    @apply max-w-container mx-auto;
+  }
+
+  /* Header Components */
+  .header {
+    @apply bg-white shadow-md sticky top-0 z-50;
+  }
+
+  .header-container {
+    @apply max-w-7xl mx-auto px-4 py-4 flex justify-between items-center;
+  }
+
+  .logo-ets {
+    @apply h-12 w-auto;
+  }
+
+  .header-links {
+    @apply flex gap-4;
+  }
+
+  .link-ets {
+    @apply text-ets-red hover:text-ets-darkred font-medium transition-colors;
+  }
+
+  .nav-bar {
+    @apply bg-ets-red;
+  }
+
+  .nav-list {
+    @apply max-w-7xl mx-auto px-4 flex list-none overflow-x-auto;
+  }
+
+  .nav-item {
+    @apply text-white px-4 py-3 block hover:bg-ets-darkred transition-colors whitespace-nowrap;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply px-4 py-2 rounded transition-colors duration-200 font-medium;
+  }
+
+  .btn-primary {
+    @apply btn bg-ets-red text-white hover:bg-ets-darkred;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-gray-700 border border-gray-300 hover:bg-gray-50;
+  }
+
+  /* Forms */
+  .form-container {
+    @apply bg-white rounded-lg shadow-card p-6 max-w-md mx-auto;
+  }
+
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-ets-red focus:border-transparent;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  .form-error {
+    @apply text-red-600 text-sm mt-1;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-lg shadow-card overflow-hidden;
+  }
+
+  .card-header {
+    @apply bg-ets-red text-white p-4;
+  }
+
+  .card-body {
+    @apply p-4;
+  }
+
+  /* Messages */
+  .success-message {
+    @apply text-green-600 text-center font-medium mb-4;
+  }
+
+  .error-message {
+    @apply text-red-600 text-center font-medium mb-4;
+  }
+}
+
+
+
