@@ -50,7 +50,7 @@ export default function Connexion() {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/nextgen/user/login', {
+      const response = await fetch('/api/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,3 +172,5 @@ export default function Connexion() {
     </div>
   );
 }
+
+
