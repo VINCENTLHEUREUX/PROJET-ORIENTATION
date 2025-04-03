@@ -93,29 +93,92 @@ export default function FormulaireOrientation() {
       resultats[genie] = total;
     });
     
-    return resultats;
+    const resultatgpa = resultats["genie_production_automatisee"] || 0;
+    const resultatmec = resultats["genie_mecanique"] || 0;
+    const resultatgti = resultats["genie_technologies_information"] || 0;
+    const resultatctn = resultats["genie_construction"] || 0;
+    const resultatele = resultats["genie_electrique"] || 0;
+    const resultataer = resultats["genie_aerospatial"] || 0;
+    const resultatgol = resultats["genie_operations_logistique"] || 0;
+    const resultatlog = resultats["genie_logiciel"] || 0;
+    
+    return { 
+      resultats,
+      resultatgpa,
+      resultatmec, 
+      resultatgti, 
+      resultatctn, 
+      resultatele, 
+      resultataer, 
+      resultatgol, 
+      resultatlog
+    };
   };
 
   const envoyer = async () => {
     setIsSubmitting(true);
     setErreur("");
     
-    const scoresFinals = calculerResultats();
-    setResultats(scoresFinals);
+    const { 
+      resultats,
+      resultatgpa,
+      resultatmec, 
+      resultatgti, 
+      resultatctn, 
+      resultatele, 
+      resultataer, 
+      resultatgol, 
+      resultatlog
+    } = calculerResultats();
+    
+    setResultats(resultats);
+    
+    const requestPayload = {
+      email: "admin@projetorientation.com",
+      password: "MotDePasseSecurise123",
+      resultatgpa: Number(resultatgpa || 0),
+      resultatmec: Number(resultatmec || 0), 
+      resultatgti: Number(resultatgti || 0), 
+      resultatctn: Number(resultatctn || 0), 
+      resultatele: Number(resultatele || 0), 
+      resultataer: Number(resultataer || 0), 
+      resultatgol: Number(resultatgol || 0), 
+      resultatlog: Number(resultatlog || 0)
+    };
+    
+    console.log("Sending data to server:", requestPayload);
     
     try {
-      const response = await fetch('/nextgen/result', {
+      const response = await fetch('http://localhost:8080/nextgen/result', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
+        credentials: 'include',
         body: JSON.stringify({
-          reponses: reponses,
-          resultats: scoresFinals,
-          date: new Date().toISOString()
+          "email": "admin@projetorientation.com",
+          "password": "MotDePasseSecurise123",
+          "resultatGPA": Number(resultatgpa || 0),
+          "resultatMEC": Number(resultatmec || 0), 
+          "resultatGTI": Number(resultatgti || 0), 
+          "resultatCTN": Number(resultatctn || 0), 
+          "resultatELE": Number(resultatele || 0), 
+          "resultatAER": Number(resultataer || 0), 
+          "resultatGOL": Number(resultatgol || 0), 
+          "resultatLOG": Number(resultatlog || 0)
         })
       });
+      
+      // Log response information for debugging
+      console.log("Response status:", response.status);
+      const responseData = await response.text();
+      console.log("Response body:", responseData);
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${responseData || 'Unknown error'}`);
+      }
       
       if (!response.ok) {
         throw new Error('Erreur lors de l\'envoi des résultats');
@@ -132,7 +195,7 @@ export default function FormulaireOrientation() {
               state: { 
                 fromOrientation: true,
                 orientationResults: {
-                  scores: scoresFinals
+                  scores: resultats
                 }
               } 
             });
@@ -346,6 +409,3 @@ export default function FormulaireOrientation() {
     </div>
   );
 }
-
-
-
