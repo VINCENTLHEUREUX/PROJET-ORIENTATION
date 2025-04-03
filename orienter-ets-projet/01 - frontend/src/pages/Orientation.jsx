@@ -104,7 +104,7 @@ export default function FormulaireOrientation() {
     setResultats(scoresFinals);
     
     try {
-      const response = await fetch('/api/results', {
+      const response = await fetch('/nextgen/result', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
