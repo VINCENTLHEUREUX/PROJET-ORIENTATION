@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import "../styles/accueil.css";
 import Header from "../components/Header";
-
+import Footer from "../components/Footer";
 
 
 
@@ -29,40 +29,7 @@ export default function Accueil() {
       </main>
 
       {/* Pied de page */}
-      <footer className="footer">
-        <div className="footer-content">
-          <div className="footer-col">
-            <h3>École de technologie supérieure</h3>
-            <p>1100, rue Notre-Dame Ouest</p>
-            <p>Montréal (Québec) H3C 1K3</p>
-            <p>Canada</p>
-            <p>Téléphone: 514 396-8800</p>
-          </div>
-          <div className="footer-col">
-            <h3>Liens rapides</h3>
-            <ul className="footer-links">
-              <li><a href="#">Admission</a></li>
-              <li><a href="#">Programmes</a></li>
-              <li><a href="#">Bibliothèque</a></li>
-              <li><a href="#">Recherche</a></li>
-              <li><a href="#">Plan du site</a></li>
-            </ul>
-          </div>
-          <div className="footer-col">
-            <h3>Restez connectés</h3>
-            <div className="social-links">
-              <a href="#">Facebook</a>
-              <a href="#">Twitter</a>
-              <a href="#">Instagram</a>
-              <a href="#">LinkedIn</a>
-            </div>
-            <p>Abonnez-vous à notre infolettre pour rester informé des dernières nouvelles et événements.</p>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>&copy; 2025 École de technologie supérieure. Tous droits réservés.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
