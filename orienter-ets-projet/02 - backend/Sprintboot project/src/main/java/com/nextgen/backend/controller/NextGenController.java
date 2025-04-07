@@ -217,4 +217,19 @@ public class NextGenController {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
+    @GetMapping("/programs")
+    public ResponseEntity<?> getAllPrograms() {
+        Map<String, Object> response = new HashMap<>();
+        List<ProgramInfo> programs = nextGenProgramsService.findAllPrograms();
+
+        if (programs != null && !programs.isEmpty()) {
+            response.put("message", "OK");
+            response.put("programs", programs);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("message", "Error: no programs found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
 }

@@ -3,9 +3,6 @@ package com.nextgen.backend.model;
 public class ResultatRequest {
     private int resultatGOL;
     private int resultatELE;
-
-
-
     private int resultatMEC;
     private int resultatLOG;
     private int resultatAER;

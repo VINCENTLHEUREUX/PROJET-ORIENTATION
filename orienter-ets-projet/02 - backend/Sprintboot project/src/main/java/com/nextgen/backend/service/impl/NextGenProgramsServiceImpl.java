@@ -5,6 +5,8 @@ import com.nextgen.backend.repository.NextGenProgramsRepository;
 import com.nextgen.backend.service.NextGenProgramsService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class NextGenProgramsServiceImpl implements NextGenProgramsService {
 
@@ -63,5 +65,8 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
         program.setProgramId(programmeCopie.getProgramId());
         nextGenProgramsRepository.delete(program);
         return true;
+    }
+    public List<ProgramInfo> findAllPrograms(){
+        return nextGenProgramsRepository.findAll();
     }
 }
