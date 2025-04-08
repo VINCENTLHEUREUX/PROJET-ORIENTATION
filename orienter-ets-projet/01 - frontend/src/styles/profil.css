@@ -1,1 +1,127 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom components */
+@layer components {
+  .profile-page {
+    min-height: 100vh;
+    background-color: rgb(249 250 251);
+  }
+
+  .profile-main {
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .profile-container {
+    max-width: 56rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .profile-section {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #CF1F38;
+    margin-bottom: 1rem;
+  }
+
+  .info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .info-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .info-label {
+    color: rgb(75 85 99);
+  }
+
+  .info-value {
+    font-weight: 500;
+  }
+
+  .results-section {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+  }
+
+  .result-item {
+    border-bottom: 1px solid rgb(229 231 235);
+    padding-bottom: 1rem;
+  }
+
+  .result-item:last-child {
+    border-bottom: 0;
+  }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-name {
+    font-weight: 500;
+  }
+
+  .result-score {
+    color: #CF1F38;
+    font-weight: 700;
+  }
+
+  .progress-bar {
+    width: 100%;
+    background-color: rgb(229 231 235);
+    border-radius: 9999px;
+    height: 0.625rem;
+  }
+
+  .progress-value {
+    background-color: #CF1F38;
+    height: 0.625rem;
+    border-radius: 9999px;
+  }
+
+  .loading-state {
+    text-align: center;
+  }
+
+  .error-state {
+    color: rgb(220 38 38);
+    text-align: center;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .info-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
