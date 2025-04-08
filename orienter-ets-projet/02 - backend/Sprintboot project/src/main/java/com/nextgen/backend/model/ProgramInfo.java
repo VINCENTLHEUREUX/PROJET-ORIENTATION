@@ -12,14 +12,19 @@ public class ProgramInfo {
     private String sigle;
     private String nom;
     private String description;
+    private String url;
+    private int credits;
 
     public ProgramInfo(){}
 
-    public ProgramInfo(Long programId, String sigle, String nom, String description){
+    public ProgramInfo(Long programId, String sigle, String nom, String description,
+                       String url, int credits){
         this.programId = programId;
         this.sigle = sigle;
         this.nom = nom;
         this.description = description;
+        this.url = url;
+        this.credits = credits;
     }
 
     public Long getProgramId() {
@@ -34,6 +39,8 @@ public class ProgramInfo {
     public String getSigle() {
         return sigle;
     }
+    public String getUrl() { return url; }
+    public int getCredits() { return credits; }
     public void setDescription(String description) {
         this.description = description;
     }
@@ -46,5 +53,7 @@ public class ProgramInfo {
     public void setSigle(String sigle) {
         this.sigle = sigle;
     }
+    public void setUrl(String url) { this.url = url;}
+    public void setCredits(int credits) {this.credits = credits;}
 }
 
