@@ -1,60 +1,91 @@
-/* Import Tailwind directives */
+
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
 /* Custom components */
-.formations-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-}
+@layer components {
+  .formations-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1.5rem;
 
-.formation-card {
-  @apply bg-white rounded-lg shadow-card p-6 transition-transform duration-300 hover:-translate-y-1;
-}
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
-.formation-card.compatibility-high {
-  @apply border-t-4 border-compatibility-high;
-}
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
 
-.formation-card.compatibility-medium {
-  @apply border-t-4 border-compatibility-medium;
-}
+  .formation-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    padding: 1.5rem;
+    transition-property: transform;
+    transition-duration: 300ms;
+  }
 
-.formation-card.compatibility-low {
-  @apply border-t-4 border-compatibility-low;
-}
+  .formation-card.compatibility-high {
+    border-top-width: 4px;
+    border-color: var(--compatibility-high);
+  }
 
-.search-filter-container {
-  @apply flex flex-wrap gap-4 mb-8;
-}
+  .formation-card.compatibility-medium {
+    border-top-width: 4px;
+    border-color: var(--compatibility-medium);
+  }
 
-.results-legend {
-  @apply flex flex-wrap gap-4 my-4;
-}
+  .formation-card.compatibility-low {
+    border-top-width: 4px;
+    border-color: var(--compatibility-low);
+  }
 
-.legend-item {
-  @apply flex items-center gap-2 text-sm;
-}
-
-.legend-color {
-  @apply w-4 h-4 rounded;
-}
-
-.legend-color.compatibility-high {
-  @apply bg-compatibility-high;
-}
-
-.legend-color.compatibility-medium {
-  @apply bg-compatibility-medium;
-}
-
-.legend-color.compatibility-low {
-  @apply bg-compatibility-low;
-}
-
-@media (max-width: 768px) {
   .search-filter-container {
-    @apply flex-col;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .results-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .legend-color {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+  }
+
+  .legend-color.compatibility-high {
+    background-color: #4CAF50;
+  }
+
+  .legend-color.compatibility-medium {
+    background-color: #FFA726;
+  }
+
+  .legend-color.compatibility-low {
+    background-color: #EF5350;
+  }
+
+  @media (max-width: 768px) {
+    .search-filter-container {
+      flex-direction: column;
+    }
   }
 }
 
