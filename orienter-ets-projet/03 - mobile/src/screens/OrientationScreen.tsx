@@ -110,18 +110,60 @@ const OrientationScreen = () => {
 
     try {
       const results = calculateResults();
-      await apiService.submitOrientation(results);
-      navigation.navigate('Formations', { results });
+      const { email, password, ...numericalResults } = results;
+      await apiService.submitOrientation(numericalResults);
+      navigation.navigate('Formations', { results: numericalResults });
     } catch (err) {
       setError('Une erreur est survenue');
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
   const calculateResults = () => {
-    // Implement your results calculation logic here
-    return {};
+    const { 
+      resultatgpa,
+      resultatmec, 
+      resultatgti, 
+      resultatctn, 
+      resultatele, 
+      resultataer, 
+      resultatgol, 
+      resultatlog
+    } = (() => {
+      const results: Record<string, number> = {};
+      
+      Object.entries(answers).forEach(([genie, responses]) => {
+        const total = Object.values(responses as Record<number, number>)
+          .reduce((sum, note) => sum + note, 0);
+        results[genie] = total;
+      });
+      
+      return {
+        resultatgpa: results["genie_production_automatisee"] || 0,
+        resultatmec: results["genie_mecanique"] || 0,
+        resultatgti: results["genie_technologies_information"] || 0,
+        resultatctn: results["genie_construction"] || 0,
+        resultatele: results["genie_electrique"] || 0,
+        resultataer: results["genie_aerospatial"] || 0,
+        resultatgol: results["genie_operations_logistique"] || 0,
+        resultatlog: results["genie_logiciel"] || 0
+      };
+    })();
+
+    return {
+      email: "admin@projetorientation.com",
+      password: "MotDePasseSecurise123",
+      resultatgpa: Number(resultatgpa || 0),
+      resultatmec: Number(resultatmec || 0), 
+      resultatgti: Number(resultatgti || 0), 
+      resultatctn: Number(resultatctn || 0), 
+      resultatele: Number(resultatele || 0), 
+      resultataer: Number(resultataer || 0), 
+      resultatgol: Number(resultatgol || 0), 
+      resultatlog: Number(resultatlog || 0)
+    };
   };
 
   return (
@@ -253,6 +295,10 @@ const styles = StyleSheet.create({
 });
 
 export default OrientationScreen;
+
+
+
+
 
 
 

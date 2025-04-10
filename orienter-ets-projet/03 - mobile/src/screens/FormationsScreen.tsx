@@ -43,7 +43,6 @@ const FormationsScreen: FC = () => {
     try {
       const [programsData, savedResults] = await Promise.all([
         apiService.getPrograms(),
-        // Only fetch saved results if we don't have results from the test
         !resultsFromTest ? apiService.getOrientationResults() : null
       ]);
 
@@ -55,8 +54,8 @@ const FormationsScreen: FC = () => {
       let sortedFormations = [...programsData];
       if (finalResults) {
         sortedFormations.sort((a, b) => {
-          const scoreA = finalResults[`resultat${a.code.toUpperCase()}`] || 0;
-          const scoreB = finalResults[`resultat${b.code.toUpperCase()}`] || 0;
+          const scoreA = finalResults[`resultat${a.code.toLowerCase()}`] || 0;
+          const scoreB = finalResults[`resultat${b.code.toLowerCase()}`] || 0;
           return scoreB - scoreA;
         });
       }
@@ -80,8 +79,7 @@ const FormationsScreen: FC = () => {
 
   const getCompatibilityScore = (formation: Formation) => {
     if (!orientationResults) return 0;
-    // Match the backend's case format (uppercase)
-    const key = `resultat${formation.code.toUpperCase()}`;
+    const key = `resultat${formation.code.toLowerCase()}`;
     return orientationResults[key] || 0;
   };
 
@@ -276,6 +274,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
 
 
 

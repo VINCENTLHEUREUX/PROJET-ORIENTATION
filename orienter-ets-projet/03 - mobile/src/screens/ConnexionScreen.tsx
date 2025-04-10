@@ -58,7 +58,7 @@ const ConnexionScreen = () => {
 
     try {
       await apiService.login(email, password);
-      login(); // Update auth context
+      login(email); // Update auth context
       navigation.navigate('Accueil');
     } catch (err) {
       setError('Email ou mot de passe incorrect');
@@ -170,6 +170,7 @@ const styles = StyleSheet.create<Styles>({
 });
 
 export default ConnexionScreen;
+
 
 
 

@@ -10,6 +10,7 @@ type RootStackParamList = {
   Inscription: undefined;
   Orientation: undefined;
   Formations: { results?: Record<string, number> };
+  Profile: undefined;
 };
 
 import AccueilScreen from './src/screens/AccueilScreen';
@@ -17,6 +18,7 @@ import ConnexionScreen from './src/screens/ConnexionScreen';
 import InscriptionScreen from './src/screens/InscriptionScreen';
 import OrientationScreen from './src/screens/OrientationScreen';
 import FormationsScreen from './src/screens/FormationsScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -42,6 +44,7 @@ const App = () => {
             <Stack.Screen name="Inscription" component={InscriptionScreen} />
             <Stack.Screen name="Orientation" component={OrientationScreen} />
             <Stack.Screen name="Formations" component={FormationsScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AuthProvider>
@@ -50,6 +53,7 @@ const App = () => {
 };
 
 export default App;
+
 
 
 

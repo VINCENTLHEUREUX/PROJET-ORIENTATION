@@ -35,7 +35,7 @@ const InscriptionScreen = () => {
     try {
       await apiService.register(formData);
       Alert.alert('Succès', 'Inscription réussie !', [
-        { text: 'OK', onPress: () => navigation.navigate('Connexion') }
+        { text: 'OK', onPress: () => navigation.navigate('Connexion' as never) }
       ]);
     } catch (err) {
       setError('Une erreur est survenue lors de l\'inscription');
@@ -103,7 +103,7 @@ const InscriptionScreen = () => {
 
           <Button
             title="Déjà un compte ? Se connecter"
-            onPress={() => navigation.navigate('Connexion')}
+            onPress={() => navigation.navigate('Connexion' as never)}
             variant="secondary"
           />
         </View>
@@ -151,3 +151,4 @@ const styles = StyleSheet.create({
 });
 
 export default InscriptionScreen;
+
