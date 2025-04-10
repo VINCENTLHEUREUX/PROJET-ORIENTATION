@@ -49,7 +49,6 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
             return false;
         }
         programmeCopie = findBySigle(program.getSigle());
-        program.setProgramId(programmeCopie.getProgramId());
         nextGenProgramsRepository.save(program);
         return true;
     }
@@ -62,7 +61,6 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
             return false;
         }
         programmeCopie = findBySigle(program.getSigle());
-        program.setProgramId(programmeCopie.getProgramId());
         nextGenProgramsRepository.delete(program);
         return true;
     }

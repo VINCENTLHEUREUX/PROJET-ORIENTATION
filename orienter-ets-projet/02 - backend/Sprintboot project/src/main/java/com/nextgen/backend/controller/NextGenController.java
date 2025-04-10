@@ -1,11 +1,10 @@
 package com.nextgen.backend.controller;
 
-import com.nextgen.backend.model.ProgramInfo;
-import com.nextgen.backend.model.ResultatQuizz;
-import com.nextgen.backend.model.ResultatRequest;
-import com.nextgen.backend.model.User;
+import com.nextgen.backend.model.*;
+import com.nextgen.backend.repository.NextGenProfilRepository;
 import com.nextgen.backend.repository.NextGenResultatRepository;
 import com.nextgen.backend.repository.NextGenUserRepository;
+import com.nextgen.backend.service.NextGenProfilService;
 import com.nextgen.backend.service.NextGenProgramsService;
 import com.nextgen.backend.service.NextGenResultatService;
 import com.nextgen.backend.service.NextGenUserService;
@@ -25,14 +24,17 @@ public class NextGenController {
     private final NextGenUserService nextGenUserService;
     private final NextGenResultatService nextGenResultatService;
     private final NextGenProgramsService nextGenProgramsService;
+    private final NextGenProfilService nextGenProfilService;
 
     @Autowired
     public NextGenController(NextGenUserService nextGenUserService,
                              NextGenResultatService nextGenResultatService,
-                             NextGenProgramsService nextGenProgramsService) {
+                             NextGenProgramsService nextGenProgramsService,
+                             NextGenProfilService nextGenProfilService) {
         this.nextGenUserService = nextGenUserService;
         this.nextGenResultatService = nextGenResultatService;
         this.nextGenProgramsService = nextGenProgramsService;
+        this.nextGenProfilService = nextGenProfilService;
     }
 
     @PostMapping("/results")
@@ -231,5 +233,31 @@ public class NextGenController {
             response.put("message", "Error: no programs found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+    }
+    public ResponseEntity<?> getProfil(@RequestParam String email) {
+        Map<String, Object> response = new HashMap<>();
+        if (nextGenProfilService.existsByEmail(email)) {
+            Profil profil = nextGenProfilService.getProfilByEmail(email);
+            response.put("message","Success");
+            response.put("biographie", profil.getBiographie());
+            response.put("etudes", profil.getEtudes());
+            response.put("picture_url", profil.getPictureUrl());
+        }
+        response.put("message","Error: could not find user");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+    @PostMapping("/profil")
+    public ResponseEntity<?> setProfil(@RequestBody ProfilRequest requete) {
+        Map<String, Object> response = new HashMap<>();
+        User user = nextGenProfilService.getUserFromRequest(requete);
+        if (nextGenUserService.loginUser(user)){
+            Profil profil = nextGenProfilService.getProfilFromRequest(requete);
+            if (nextGenProfilService.createProfil(profil)){
+                response.put("message","Success");
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+        }
+        response.put("message","Error: could not find user");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

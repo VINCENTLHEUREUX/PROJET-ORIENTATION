@@ -7,8 +7,6 @@ import jakarta.persistence.*;
 
 public class ProgramInfo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long programId;
     private String sigle;
     private String nom;
     private String description;
@@ -17,9 +15,8 @@ public class ProgramInfo {
 
     public ProgramInfo(){}
 
-    public ProgramInfo(Long programId, String sigle, String nom, String description,
+    public ProgramInfo(String sigle, String nom, String description,
                        String url, int credits){
-        this.programId = programId;
         this.sigle = sigle;
         this.nom = nom;
         this.description = description;
@@ -27,9 +24,6 @@ public class ProgramInfo {
         this.credits = credits;
     }
 
-    public Long getProgramId() {
-        return programId;
-    }
     public String getNom(){
         return nom;
     }
@@ -43,9 +37,6 @@ public class ProgramInfo {
     public int getCredits() { return credits; }
     public void setDescription(String description) {
         this.description = description;
-    }
-    public void setProgramId(Long programId) {
-        this.programId = programId;
     }
     public void setNom(String nom) {
         this.nom = nom;

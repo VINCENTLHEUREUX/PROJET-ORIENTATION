@@ -1,11 +1,12 @@
 package com.nextgen.backend.repository;
 
+import com.nextgen.backend.model.Profil;
 import com.nextgen.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface NextGenUserRepository extends JpaRepository<User, Long> {
-    long findUserIdByEmail(String email);
+public interface NextGenProfilRepository extends JpaRepository<Profil, Long> {
+    Profil findProfilByEmail(String email);
+
     boolean existsByEmail(String email);
-    User getUserByEmail(String email);
     boolean deleteByEmail(String email);
 }
