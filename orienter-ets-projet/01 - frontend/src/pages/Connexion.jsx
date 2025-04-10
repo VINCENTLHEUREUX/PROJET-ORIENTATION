@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import '../styles/connexion.css';
 
 export default function Connexion() {
+  const { login } = useAuth();
   const [donneesConnexion, setDonneesConnexion] = useState({
     email: '',
     password: ''
@@ -55,11 +57,8 @@ export default function Connexion() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: donneesConnexion.email,
-          password: donneesConnexion.password
-        }),
-        credentials: 'include' // Pour gérer les cookies si nécessaire
+        body: JSON.stringify(donneesConnexion),
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -69,18 +68,21 @@ export default function Connexion() {
 
       const data = await response.json();
       
-      // Stocker le token si présent dans la réponse
       if (data.token) {
         localStorage.setItem('authToken', data.token);
       }
 
+      // Stocker les informations de l'utilisateur
+      login({
+        email: donneesConnexion.email,
+        token: data.token
+      });
+
       setMessageSucces("Connexion réussie ! Redirection...");
       setErreurs({});
-      setDonneesConnexion({ email: '', password: '' });
-
-      // Redirection après 2 secondes
+      
       setTimeout(() => {
-        navigate('/'); // Rediriger vers la page d'accueil ou tableau de bord
+        navigate('/');
       }, 2000);
 
     } catch (err) {
@@ -172,5 +174,6 @@ export default function Connexion() {
     </div>
   );
 }
+
 
 

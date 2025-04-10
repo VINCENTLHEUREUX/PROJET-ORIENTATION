@@ -364,22 +364,29 @@ export default function FormulaireOrientation() {
           <div className="results-container">
             <div className="results-header">
               <h1 className="text-2xl font-bold text-ets-red mb-2">
-                Résultats de votre orientation
+                Résultat de votre orientation
               </h1>
               <p className="text-gray-600">
-                Voici les programmes qui correspondent le mieux à votre profil
+                Voici le programme qui correspond le mieux à votre profil
               </p>
             </div>
 
             <div className="results-list">
-              {Object.entries(resultats)
-                .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
-                .map(([genie, score]) => (
+              {(() => {
+                const maxEntry = Object.entries(resultats)
+                  .reduce((max, current) => 
+                    current[1] > max[1] ? current : max
+                  );
+                const [genie, score] = maxEntry;
+                const pourcentage = Math.round((score / 25) * 100); // 25 est le score maximum possible (5 questions × 5 points)
+                
+                return (
                   <div key={genie} className="result-item">
                     <span className="program-name">{formatNomGenie(genie)}</span>
-                    <span className="program-score">{score} points</span>
+                    <span className="program-score">{pourcentage}%</span>
                   </div>
-                ))}
+                );
+              })()}
             </div>
 
             <div className="recommendation-section">
@@ -387,11 +394,10 @@ export default function FormulaireOrientation() {
                 Programme recommandé
               </h3>
               <p className="mb-4">
-                Selon vos réponses, le programme qui pourrait vous convenir le mieux est :
+                Selon vos réponses, ce programme correspond le mieux à votre profil.
+                Nous vous encourageons à explorer les détails de ce programme ainsi que d'autres
+                qui pourraient vous intéresser.
               </p>
-              <div className="text-xl font-bold text-ets-red">
-                {formatNomGenie(getGenieRecommande())}
-              </div>
             </div>
 
             <div className="mt-8 text-center">
