@@ -1,8 +1,8 @@
 package com.nextgen.backend.service;
 
-import com.nextgen.backend.model.ResultatQuizz;
-import com.nextgen.backend.model.ResultatRequest;
-import com.nextgen.backend.model.User;
+import com.nextgen.backend.tables.ResultatQuizz;
+import com.nextgen.backend.tables.requests.ResultatRequest;
+import com.nextgen.backend.tables.User;
 
 public interface NextGenResultatService {
 

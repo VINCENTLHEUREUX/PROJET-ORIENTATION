@@ -1,6 +1,6 @@
 package com.nextgen.backend.service;
 
-import com.nextgen.backend.model.User;
+import com.nextgen.backend.tables.User;
 
 import java.util.List;
 
@@ -14,5 +14,7 @@ public interface NextGenUserService {
     public List<User> getAllUsers();
     public boolean isValidEmail(String email);
     public boolean strongPassword(String password);
-    public boolean loginUser(User user);
+    public boolean loginUserEmail(User user);
+    public boolean loginUserToken(User user);
+    public User getUserByToken(String token);
 }

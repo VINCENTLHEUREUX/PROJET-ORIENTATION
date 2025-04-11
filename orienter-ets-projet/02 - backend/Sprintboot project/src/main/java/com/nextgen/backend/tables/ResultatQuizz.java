@@ -1,4 +1,4 @@
-package com.nextgen.backend.model;
+package com.nextgen.backend.tables;
 
 import com.nextgen.backend.repository.NextGenUserRepository;
 import jakarta.persistence.*;

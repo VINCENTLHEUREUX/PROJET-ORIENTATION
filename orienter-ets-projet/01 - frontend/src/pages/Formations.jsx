@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -8,8 +8,9 @@ import '../styles/formations.css';
 export default function Formations() {
   const [formations, setFormations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('compatibility');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [filter, setFilter] = useState('tous');
-  const [sortedFormations, setSortedFormations] = useState([]);
   const [orientationResults, setOrientationResults] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -25,7 +26,7 @@ export default function Formations() {
       setError(null);
       
       try {
-        const formationsResponse = await axios.get('/api/programs');
+        const formationsResponse = await axios.get('api/programs');
         
         if (formationsResponse.data && formationsResponse.data.programs) {
           const programsWithMappedFields = formationsResponse.data.programs.map(program => ({
@@ -38,31 +39,24 @@ export default function Formations() {
           }));
           
           setFormations(programsWithMappedFields);
-          setSortedFormations(programsWithMappedFields);
           
-          const userStatusResponse = true
-          
+          const userToken = localStorage.getItem('authToken');
+
+          if (userToken) {
             try {
-              const orientationResponse = await axios.post('/api/results', {
-                email: "admin@projetorientation.com",
-                password: "MotDePasseSecurise123"
-              });
               
-              if (orientationResponse.data) {
-                setOrientationResults(orientationResponse.data);
-                setShowResults(true);
-                
-                const sortedByScore = [...programsWithMappedFields].sort((a, b) => {
-                  const scoreA = orientationResponse.data[`resultat${a.id.toLowerCase()}`] || 0;
-                  const scoreB = orientationResponse.data[`resultat${b.id.toLowerCase()}`] || 0;
-                  return scoreB - scoreA;
+                const orientationResponse = await axios.post('api/results', {
+                  token: userToken  
                 });
                 
-                setSortedFormations(sortedByScore);
-              }
+                if (orientationResponse.data) {
+                  setOrientationResults(orientationResponse.data);
+                  setShowResults(true);
+                }
             } catch (orientationErr) {
               console.error('Erreur lors de la récupération des résultats d\'orientation:', orientationErr);
             }
+          }
         }
       } catch (err) {
         console.error('Erreur lors de la récupération des données:', err);
@@ -74,19 +68,13 @@ export default function Formations() {
 
     fetchData();
   }, [fromOrientation]);
-
-  const filteredFormations = Array.isArray(sortedFormations) ? sortedFormations.filter(formation => {
-    const matchesSearch = formation.titre.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         formation.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filter === 'tous' || formation.id === filter;
-    return matchesSearch && matchesFilter;
-  }) : [];
-
-  const resetSort = () => {
-    setSortedFormations([...formations]);
-    setShowResults(false);
+  
+  const getCompatibilityPercentage = (formationId) => {
+    if (!orientationResults || !showResults) return 0;
+    const score = orientationResults[`resultat${formationId.toLowerCase()}`] || 0;
+    return Math.round(((score-5)/ 20) * 100); 
   };
-
+  
   const getCompatibilityClass = (formationId) => {
     if (!orientationResults || !showResults) return '';
     
@@ -96,19 +84,64 @@ export default function Formations() {
     return 'compatibility-low';
   };
 
-  const getCompatibilityPercentage = (formationId) => {
-    if (!orientationResults || !showResults) return null;
-    const score = orientationResults[`resultat${formationId.toLowerCase()}`] || 0;
-    return Math.round((score / 25) * 100);
+  const filteredFormations = useMemo(() => {
+    if (!Array.isArray(formations)) return [];
+    
+    return formations.filter(formation => {
+      const matchesSearch = formation.titre.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           formation.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter = filter === 'tous' || formation.id === filter;
+      return matchesSearch && matchesFilter;
+    });
+  }, [formations, searchTerm, filter]);
+  
+  const sortedFormations = useMemo(() => {
+    if (!filteredFormations.length) return [];
+    
+    return [...filteredFormations].sort((a, b) => {
+      let valueA, valueB;
+      
+      switch (sortBy) {
+        case 'nom':
+          valueA = a.titre.toLowerCase();
+          valueB = b.titre.toLowerCase();
+          break;
+        case 'credits':
+          valueA = typeof a.credits === 'number' ? a.credits : 0;
+          valueB = typeof b.credits === 'number' ? b.credits : 0;
+          break;
+        case 'compatibility':
+          valueA = getCompatibilityPercentage(a.id);
+          valueB = getCompatibilityPercentage(b.id);
+          break;
+        default:
+          valueA = a.titre.toLowerCase();
+          valueB = b.titre.toLowerCase();
+      }
+      
+      if (sortOrder === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
+  }, [filteredFormations, sortBy, sortOrder]);
+  
+  const handleSortChange = (critere) => {
+    if (sortBy === critere) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(critere);
+      setSortOrder(critere === 'compatibility' ? 'desc' : 'asc');
+    }
   };
-
-  const generateFilterOptions = () => {
-    return [
-      <option key="tous" value="tous">Tous les programmes</option>,
-      ...formations.map(formation => (
-        <option key={formation.id} value={formation.id}>{formation.titre}</option>
-      ))
-    ];
+  
+  const resetSort = () => {
+    setSortBy('compatibility');
+    setSortOrder('desc');
+    setFilter('tous');
+    setSearchTerm('');
+    setShowResults(false);
   };
 
   return (
@@ -140,13 +173,13 @@ export default function Formations() {
                 <span className="legend-item"><span className="legend-color compatibility-medium"></span> Compatibilité moyenne (60-79%)</span>
                 <span className="legend-item"><span className="legend-color compatibility-low"></span> Compatibilité faible (0-59%)</span>
               </div>
-              <button className="btn-secondary" onClick={resetSort}>Réinitialiser les résultats</button>
             </div>
           )}
           
           {!loading && !error && (
             <div className="search-filter-container">
               <div className="search-bar">
+                <div className="search-icon">🔍</div>
                 <input
                   type="text"
                   placeholder="Rechercher une formation..."
@@ -154,12 +187,32 @@ export default function Formations() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="filter-options">
-                <label>Filtrer par :</label>
-                <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-                  {generateFilterOptions()}
-                </select>
+              
+              <div className="filter-controls">
+                <div className="filter-options">
+                  <label>Filtrer par :</label>
+                  <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
+                    <option value="nom">Nom</option>
+                    <option value="credits">Crédits</option>
+                    {showResults && (
+                      <option value="compatibility">Compatibilité</option>
+                    )}
+                  </select>
+                  <button 
+                    className="sort-order-button" 
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  >
+                    {sortOrder === 'asc' ? '↑' : '↓'}
+                  </button>
+                </div>
+                
+                {showResults && (
+                  <button className="btn-secondary results-toggle" onClick={resetSort}>
+                    Masquer les résultats
+                  </button>
+                )}
               </div>
+              
               {!showResults && (
                 <div className="orientation-cta">
                   <Link to="/orientation" className="btn-primary">Faire le test d'orientation</Link>
@@ -170,8 +223,8 @@ export default function Formations() {
           
           {!loading && !error && (
             <div className="formations-list">
-              {filteredFormations.length > 0 ? (
-                filteredFormations.map((formation) => (
+              {sortedFormations.length > 0 ? (
+                sortedFormations.map((formation) => (
                   <div key={formation.id} className={`formation-card ${getCompatibilityClass(formation.id)}`}>
                     <div className="formation-header">
                       <h2>{formation.titre}</h2>

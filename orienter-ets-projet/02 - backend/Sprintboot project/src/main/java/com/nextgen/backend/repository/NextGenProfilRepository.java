@@ -1,7 +1,6 @@
 package com.nextgen.backend.repository;
 
-import com.nextgen.backend.model.Profil;
-import com.nextgen.backend.model.User;
+import com.nextgen.backend.tables.Profil;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NextGenProfilRepository extends JpaRepository<Profil, Long> {

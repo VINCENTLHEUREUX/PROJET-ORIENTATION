@@ -1,4 +1,4 @@
-package com.nextgen.backend.model;
+package com.nextgen.backend.tables.requests;
 
 public class ResultatRequest {
     private int resultatGOL;
@@ -9,11 +9,18 @@ public class ResultatRequest {
     private int resultatCTN;
     private int resultatGPA;
     private int resultatGTI;
-    private String email;
-    private String password;
+    private String token;
 
     public ResultatRequest(){
 
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public int getResultatMEC() {
@@ -78,21 +85,5 @@ public class ResultatRequest {
 
     public void setResultatGTI(int resultatGTI) {
         this.resultatGTI = resultatGTI;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

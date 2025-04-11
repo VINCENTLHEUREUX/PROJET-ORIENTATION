@@ -381,7 +381,35 @@ input[type="range"]::-webkit-slider-thumb:hover {
   font-size: 0.9rem;
 }
 
-/* Responsive Adjustments */
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  font-size: 16px;
+  color: #666;
+}
+
+.error {
+  background-color: #ffeeee;
+  padding: 20px;
+  max-width: 600px;
+  margin: 30px auto;
+  text-align: center;
+}
+
+.error p {
+  color: #cc0000;
+  margin: 0;
+}
+
+.error-inline {
+  background-color: #ffeeee;
+  color: #cc0000;
+  padding: 10px;
+  margin: 10px 0;
+  border-left: 3px solid #cc0000;
+}
+
 @media (max-width: 768px) {
   .header-container {
     flex-direction: column;
@@ -406,7 +434,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   }
 }
 
-/* Quiz Specific Styles */
 .quiz-container {
   @apply max-w-3xl mx-auto bg-white rounded-lg shadow-card p-8;
 }

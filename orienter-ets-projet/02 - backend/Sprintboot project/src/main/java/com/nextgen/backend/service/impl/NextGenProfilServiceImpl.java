@@ -1,43 +1,57 @@
 package com.nextgen.backend.service.impl;
 
-import com.nextgen.backend.model.Profil;
-import com.nextgen.backend.model.ProfilRequest;
-import com.nextgen.backend.model.User;
+import com.nextgen.backend.tables.Profil;
+import com.nextgen.backend.tables.requests.ProfilRequest;
+import com.nextgen.backend.tables.User;
 import com.nextgen.backend.repository.NextGenProfilRepository;
-import com.nextgen.backend.repository.NextGenProgramsRepository;
+import com.nextgen.backend.repository.NextGenUserRepository;
 import com.nextgen.backend.service.NextGenProfilService;
 import org.springframework.stereotype.Service;
-
+    // Gestion des opérations a la table Profil de la DB
 @Service
 public class NextGenProfilServiceImpl implements NextGenProfilService {
-    NextGenProfilRepository nextGenProfilRepository;
-    public NextGenProfilServiceImpl(NextGenProfilRepository nextGenProfilRepository){
+
+    private final NextGenProfilRepository nextGenProfilRepository;
+    private final NextGenUserRepository nextGenUserRepository;
+
+    public NextGenProfilServiceImpl(NextGenProfilRepository nextGenProfilRepository,
+                                    NextGenUserRepository nextGenUserRepository) {
         this.nextGenProfilRepository = nextGenProfilRepository;
-    }
-    public User getUserFromRequest(ProfilRequest requete){
-        User user = new User();
-        user.setEmail(requete.getEmail());
-        user.setPassword(requete.getPassword());
-        return user;
-    }
-    public Profil getProfilFromRequest(ProfilRequest requete){
-        Profil profil = new Profil();
-        profil.setBiographie(requete.getBiographie());
-        profil.setEtudes(requete.getEtudes());
-        profil.setEmail(requete.getEmail());
-        profil.setPictureUrl(requete.getPictureUrl());
-        return profil;
+        this.nextGenUserRepository = nextGenUserRepository;
     }
 
     @Override
-    public boolean createProfil(Profil profil) {
+    public boolean saveProfil(Profil profil) {
         nextGenProfilRepository.save(profil);
         return true;
     }
-    public Profil getProfilByEmail(String email){
-        return nextGenProfilRepository.findProfilByEmail(email);
-    }
-    public boolean existsByEmail(String email){
+
+    public boolean existsByToken(String token) {
+        User user = nextGenUserRepository.getUserByToken(token);
+        String email = user.getEmail();
         return nextGenProfilRepository.existsByEmail(email);
+    }
+
+    public Profil getProfilByToken(String token) {
+        User user = nextGenUserRepository.getUserByToken(token);
+        String email = user.getEmail();
+        return nextGenProfilRepository.findProfilByEmail(email);
+    } // Il pourrait être pertinent d'avoir une fonction getProfilByEmail, mais pour
+    // l'instant c'est inutile.
+
+    // Construit un objet User a partir de ProfileRequest
+    public User getUserFromRequest(ProfilRequest requete) {
+        User user = new User();
+        user.setToken(requete.getToken());
+        return user;
+    }
+    // Construit un objet Profil a partir de ProfileRequest
+    public Profil getProfilFromRequest(ProfilRequest requete) {
+        Profil profil = new Profil();
+        profil.setBiographie(requete.getBiographie());
+        profil.setEtudes(requete.getEtudes());
+        profil.setEmail(nextGenUserRepository.getUserByToken(requete.getToken()).getEmail());
+        profil.setPictureUrl(requete.getPictureUrl());
+        return profil;
     }
 }

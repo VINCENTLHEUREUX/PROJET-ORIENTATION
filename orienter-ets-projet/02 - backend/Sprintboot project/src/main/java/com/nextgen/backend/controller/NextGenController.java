@@ -1,13 +1,12 @@
 package com.nextgen.backend.controller;
 
-import com.nextgen.backend.model.*;
-import com.nextgen.backend.repository.NextGenProfilRepository;
-import com.nextgen.backend.repository.NextGenResultatRepository;
-import com.nextgen.backend.repository.NextGenUserRepository;
-import com.nextgen.backend.service.NextGenProfilService;
-import com.nextgen.backend.service.NextGenProgramsService;
-import com.nextgen.backend.service.NextGenResultatService;
-import com.nextgen.backend.service.NextGenUserService;
+import com.nextgen.backend.service.*;
+import com.nextgen.backend.tables.Profil;
+import com.nextgen.backend.tables.ProgramInfo;
+import com.nextgen.backend.tables.ResultatQuizz;
+import com.nextgen.backend.tables.User;
+import com.nextgen.backend.tables.requests.ProfilRequest;
+import com.nextgen.backend.tables.requests.ResultatRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,71 +16,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controller for NextGen application endpoints
+ */
 @RestController
 @RequestMapping("/nextgen")
 public class NextGenController {
 
+    // Services
     private final NextGenUserService nextGenUserService;
     private final NextGenResultatService nextGenResultatService;
     private final NextGenProgramsService nextGenProgramsService;
     private final NextGenProfilService nextGenProfilService;
+    private final NextGenQuestionService nextGenQuestionService;
 
     @Autowired
     public NextGenController(NextGenUserService nextGenUserService,
                              NextGenResultatService nextGenResultatService,
                              NextGenProgramsService nextGenProgramsService,
-                             NextGenProfilService nextGenProfilService) {
+                             NextGenProfilService nextGenProfilService, NextGenQuestionService nextGenQuestionService) {
         this.nextGenUserService = nextGenUserService;
         this.nextGenResultatService = nextGenResultatService;
         this.nextGenProgramsService = nextGenProgramsService;
         this.nextGenProfilService = nextGenProfilService;
+        this.nextGenQuestionService = nextGenQuestionService;
     }
 
-    @PostMapping("/results")
-    public ResponseEntity<?> getResult(@RequestBody ResultatRequest resultatRequest) {
-
-        Map<String, Object> response = new HashMap<>();
-        ResultatQuizz resultat =
-                nextGenResultatService.findTopByEmailOrderByTimeDesc(resultatRequest.getEmail());
-        User user = nextGenResultatService.getUserFromRequest(resultatRequest);
-        if (nextGenUserService.loginUser(user)){
-
-
-
-            response.put("message", "Success");
-            response.put("resultatctn", resultat.getResultatCTN());
-            response.put("resultatele", resultat.getResultatELE());
-            response.put("resultatgol", resultat.getResultatGOL());
-            response.put("resultatgpa", resultat.getResultatGPA());
-            response.put("resultatlog", resultat.getResultatLOG());
-            response.put("resultatmec", resultat.getResultatMEC());
-            response.put("resultataer", resultat.getResultatAER());
-            response.put("resultatgti", resultat.getResultatGTI());
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        }
-        if(resultat == null){
-            response.put("message", "Error: Result not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-        response.put("message", "Error: login failed");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);        }
-
-    @PostMapping("/result")
-    public ResponseEntity<?> postResult(@RequestBody ResultatRequest resultatRequest) {
-
-        Map<String, Object> response = new HashMap<>();
-        User user = nextGenResultatService.getUserFromRequest(resultatRequest);
-        if (nextGenUserService.loginUser(user)){
-            response.put("message", "Success");
-            ResultatQuizz quizz =
-                    nextGenResultatService.getResultatFromRequest(resultatRequest);
-            nextGenResultatService.createResult(quizz);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        }
-        response.put("message", "Error: could not get user");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    }
-
+    // =============================
+    // Endpoints Utilisateurs
+    // =============================
 
     @PostMapping("/user/login")
     public ResponseEntity<?> loginUser(@RequestBody User user){
@@ -90,8 +53,13 @@ public class NextGenController {
             response.put("message", "Error: account doesn't exist");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        if (nextGenUserService.loginUser(user)){
+        if (nextGenUserService.loginUserEmail(user)){
+            User new_user = nextGenUserService.getUserByEmail(user.getEmail());
             response.put("message", "Login successful");
+            response.put("prenom", new_user.getPrenom());
+            response.put("nom", new_user.getNom());
+            response.put("role", new_user.getRole());
+            response.put("authToken", new_user.getToken());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         response.put("message", "Error: internal server error");
@@ -149,8 +117,59 @@ public class NextGenController {
         }
         response.put("message", "Wrong email and password combination");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-
     }
+
+    // =============================
+    // Endpoints Resultats
+    // =============================
+
+    @PostMapping("/results")
+    public ResponseEntity<?> getResult(@RequestBody ResultatRequest resultatRequest) {
+        Map<String, Object> response = new HashMap<>();
+
+        String email = nextGenUserService.getUserByToken(resultatRequest.getToken()).getEmail();
+        ResultatQuizz resultat =
+                nextGenResultatService.findTopByEmailOrderByTimeDesc(email);
+        User user = nextGenResultatService.getUserFromRequest(resultatRequest);
+        if (nextGenUserService.loginUserToken(user)){
+            response.put("message", "Success");
+            response.put("resultatctn", resultat.getResultatCTN());
+            response.put("resultatele", resultat.getResultatELE());
+            response.put("resultatgol", resultat.getResultatGOL());
+            response.put("resultatgpa", resultat.getResultatGPA());
+            response.put("resultatlog", resultat.getResultatLOG());
+            response.put("resultatmec", resultat.getResultatMEC());
+            response.put("resultataer", resultat.getResultatAER());
+            response.put("resultatgti", resultat.getResultatGTI());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        if(resultat == null){
+            response.put("message", "Error: Result not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("message", "Error: login failed");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @PostMapping("/result")
+    public ResponseEntity<?> postResult(@RequestBody ResultatRequest resultatRequest) {
+        Map<String, Object> response = new HashMap<>();
+        User user = nextGenResultatService.getUserFromRequest(resultatRequest);
+        if (nextGenUserService.loginUserToken(user)){
+            response.put("message", "Success");
+            ResultatQuizz quizz =
+                    nextGenResultatService.getResultatFromRequest(resultatRequest);
+            nextGenResultatService.createResult(quizz);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("message", "Error: could not get user");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    // =============================
+    // Endpoints Programmes
+    // =============================
+
     @GetMapping("/program")
     public ResponseEntity<?> getProgram(@RequestParam String sigle) {
         Map<String, Object> response = new HashMap<>();
@@ -164,6 +183,22 @@ public class NextGenController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
+
+    @GetMapping("/programs")
+    public ResponseEntity<?> getAllPrograms() {
+        Map<String, Object> response = new HashMap<>();
+        List<ProgramInfo> programs = nextGenProgramsService.findAllPrograms();
+
+        if (programs != null && !programs.isEmpty()) {
+            response.put("message", "OK");
+            response.put("programs", programs);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("message", "Error: no programs found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
     @PostMapping("/program")
     public ResponseEntity<?> setProgram(@RequestBody ProgramInfo programme){
         // Il faudra securiser ceci pour permettre l'acces administrateur seulement.
@@ -183,6 +218,7 @@ public class NextGenController {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
     @PutMapping("/program")
     public ResponseEntity<?> updateProgram(@RequestBody ProgramInfo programme){
         // Il faudra securiser ceci pour permettre l'acces administrateur seulement.
@@ -202,6 +238,7 @@ public class NextGenController {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
     @DeleteMapping("/program")
     public ResponseEntity<?> deleteProgram(@RequestBody ProgramInfo programme) {
         Map<String, Object> response = new HashMap<>();
@@ -220,44 +257,49 @@ public class NextGenController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    @GetMapping("/programs")
-    public ResponseEntity<?> getAllPrograms() {
-        Map<String, Object> response = new HashMap<>();
-        List<ProgramInfo> programs = nextGenProgramsService.findAllPrograms();
+    // =============================
+    //  Endpoints Profil
+    // =============================
 
-        if (programs != null && !programs.isEmpty()) {
-            response.put("message", "OK");
-            response.put("programs", programs);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            response.put("message", "Error: no programs found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-    }
-    public ResponseEntity<?> getProfil(@RequestParam String email) {
+    @PostMapping("/profil")
+    public ResponseEntity<?> getProfil(@RequestBody ProfilRequest profil) {
         Map<String, Object> response = new HashMap<>();
-        if (nextGenProfilService.existsByEmail(email)) {
-            Profil profil = nextGenProfilService.getProfilByEmail(email);
+        if (nextGenProfilService.existsByToken(profil.getToken())) {
+            Profil copie_profil =
+                    nextGenProfilService.getProfilByToken(profil.getToken());
             response.put("message","Success");
-            response.put("biographie", profil.getBiographie());
-            response.put("etudes", profil.getEtudes());
-            response.put("picture_url", profil.getPictureUrl());
+            response.put("email", copie_profil.getEmail());
+            response.put("biographie", copie_profil.getBiographie());
+            response.put("etudes", copie_profil.getEtudes());
+            response.put("picture_url", copie_profil.getPictureUrl());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         response.put("message","Error: could not find user");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-    @PostMapping("/profil")
-    public ResponseEntity<?> setProfil(@RequestBody ProfilRequest requete) {
+
+    @PutMapping("/profil")
+    public ResponseEntity<?> updateProfil(@RequestBody ProfilRequest requete) {
         Map<String, Object> response = new HashMap<>();
         User user = nextGenProfilService.getUserFromRequest(requete);
-        if (nextGenUserService.loginUser(user)){
+        if (nextGenUserService.loginUserToken(user)){
             Profil profil = nextGenProfilService.getProfilFromRequest(requete);
-            if (nextGenProfilService.createProfil(profil)){
+            if (nextGenProfilService.saveProfil(profil)){
                 response.put("message","Success");
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             }
+            response.put("message","Error: could not save profile");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
         response.put("message","Error: could not find user");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    // =============================
+    //  Endpoints Question
+    // =============================
+    @GetMapping("/questions")
+    public Map<String, List<String>> getQuestions() {
+        return nextGenQuestionService.getAllQuestions();
     }
 }

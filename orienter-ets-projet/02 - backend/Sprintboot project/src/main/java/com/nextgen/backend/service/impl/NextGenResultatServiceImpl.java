@@ -1,9 +1,9 @@
 package com.nextgen.backend.service.impl;
 
 
-import com.nextgen.backend.model.ResultatRequest;
-import com.nextgen.backend.model.ResultatQuizz;
-import com.nextgen.backend.model.User;
+import com.nextgen.backend.tables.requests.ResultatRequest;
+import com.nextgen.backend.tables.ResultatQuizz;
+import com.nextgen.backend.tables.User;
 import com.nextgen.backend.service.NextGenResultatService;
 import com.nextgen.backend.service.NextGenUserService;
 import org.springframework.stereotype.Service;
@@ -14,8 +14,9 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
     NextGenResultatRepository nextGenResultatRepository;
     NextGenUserService nextGenUserService;
 
-    public NextGenResultatServiceImpl (NextGenResultatRepository nextGenResultatRepository) {
+    public NextGenResultatServiceImpl (NextGenResultatRepository nextGenResultatRepository, NextGenUserService nextGenUserService) {
         this.nextGenResultatRepository = nextGenResultatRepository;
+        this.nextGenUserService = nextGenUserService;
     }
 
     public ResultatQuizz findByResultId(Long resultId) {
@@ -67,13 +68,12 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         resultatQuizz.setResultatCTN(resultatRequest.getResultatCTN());
         resultatQuizz.setResultatGPA(resultatRequest.getResultatGPA());
         resultatQuizz.setResultatGTI(resultatRequest.getResultatGTI());
-        resultatQuizz.setEmail(resultatRequest.getEmail());
+        resultatQuizz.setEmail(nextGenUserService.getUserByToken(resultatRequest.getToken()).getEmail());
         return resultatQuizz;
     }
     public User getUserFromRequest(ResultatRequest resultatRequest){
         User user = new User();
-        user.setEmail(resultatRequest.getEmail());
-        user.setPassword(resultatRequest.getPassword());
+        user.setToken(resultatRequest.getToken());
             return user;
     }
 

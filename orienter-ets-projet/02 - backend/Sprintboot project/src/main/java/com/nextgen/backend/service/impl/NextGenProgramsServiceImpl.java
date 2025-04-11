@@ -1,12 +1,12 @@
 package com.nextgen.backend.service.impl;
 
-import com.nextgen.backend.model.ProgramInfo;
+import com.nextgen.backend.tables.ProgramInfo;
 import com.nextgen.backend.repository.NextGenProgramsRepository;
 import com.nextgen.backend.service.NextGenProgramsService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+// Gestion des opérations a la table Programs de la DB
 @Service
 public class NextGenProgramsServiceImpl implements NextGenProgramsService {
 
@@ -15,6 +15,7 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
     public NextGenProgramsServiceImpl(NextGenProgramsRepository nextGenProgramsRepository){
         this.nextGenProgramsRepository = nextGenProgramsRepository;
     }
+
     public ProgramInfo findBySigle(String sigle) {
         ProgramInfo programme = nextGenProgramsRepository.findBySigle(sigle);
         if (programme != null){
@@ -28,6 +29,7 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
         }
         return false;
     }
+    // Crée un programme et s'assure de la validité. Retourne boolean pour sa validité.
     public boolean createProgram(ProgramInfo program){
         if (existsBySigle(program.getSigle())){
             return false;
@@ -39,6 +41,7 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
         nextGenProgramsRepository.save(program);
         return true;
     }
+    // Update un programme et s'assure de la validité. Retourne boolean pour sa validité.
     public boolean updateProgram(ProgramInfo program){
         ProgramInfo programmeCopie;
         if (!existsBySigle(program.getSigle())){

@@ -1,21 +1,27 @@
 package com.nextgen.backend.service.impl;
 
-import com.nextgen.backend.model.User;
+import com.nextgen.backend.tables.Profil;
+import com.nextgen.backend.tables.User;
 import com.nextgen.backend.repository.NextGenUserRepository;
+import com.nextgen.backend.service.NextGenProfilService;
 import com.nextgen.backend.service.NextGenUserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
 public class NextGenUserServiceImpl implements NextGenUserService {
 
     NextGenUserRepository nextGenUserRepository;
+    NextGenProfilService nextGenProfilService;
 
-    public NextGenUserServiceImpl(NextGenUserRepository nextGenUserRepository){
+    public NextGenUserServiceImpl(NextGenUserRepository nextGenUserRepository,
+                                  NextGenProfilService nextGenProfilService){
         this.nextGenUserRepository = nextGenUserRepository;
+        this.nextGenProfilService = nextGenProfilService;
     }
 
     @Override
@@ -29,8 +35,13 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         if (!strongPassword(user.getPassword())){
             return false;
         }
-        nextGenUserRepository.save(user);
-        return true;
+        Profil profil = new Profil();
+        profil.setEmail(user.getEmail());
+        if (nextGenProfilService.saveProfil(profil)){
+            nextGenUserRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -111,7 +122,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         return false;
     }
 
-    public boolean loginUser(User user) {
+    public boolean loginUserEmail(User user) {
         if (user == null ||  user.getEmail() == null || user.getPassword() == null) {
             return false;
         }
@@ -120,8 +131,36 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         }
         User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
         if (existsByEmail(user.getEmail()) && user.getPassword().equals(userSave.getPassword())){
+            generateToken(userSave.getEmail());
             return true;
         }
         return false;
+    }
+    public boolean loginUserToken(User user) {
+        if (user == null ||  user.getToken() == null) {
+            return false;
+        }
+        User userSave = nextGenUserRepository.getUserByToken(user.getToken());
+        if (userSave != null && !userSave.getEmail().isEmpty()){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean generateToken(String email) {
+        User user = nextGenUserRepository.getUserByEmail(email);
+        String token = UUID.randomUUID().toString();
+        user.setToken(token);
+        nextGenUserRepository.save(user);
+        return true;
+    }
+
+    // Validate a token and return the associated email
+    public User getUserByToken(String token) {
+        return nextGenUserRepository.getUserByToken(token);
+    }
+
+    // Invalidate a token (for logout)
+    public void invalidateToken(String token) {
     }
 }

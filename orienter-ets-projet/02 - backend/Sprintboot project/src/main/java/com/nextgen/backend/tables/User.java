@@ -1,10 +1,9 @@
-package com.nextgen.backend.model;
+package com.nextgen.backend.tables;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name="user")
@@ -20,6 +19,8 @@ public class User {
     private Long userId;
     private String email;
     private String password; //IL FAUT HASH CE PASSWORD
+    @Column(unique = true)
+    private String token;
     private String nom;
     private String prenom;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -30,15 +31,23 @@ public class User {
 
     public User(){}
 
-    public User(Long userId, String email, String password, String nom, String prenom, LocalDate date){
+    public User(Long userId, String email, String password, String nom, String prenom,
+                LocalDate date, String token){
         this.userId = userId;
         this.email = email;
         this.password = password;
         this.nom = nom;
         this.prenom = prenom;
         this.date = date;
+        this.token = token;
+    }
+    public String getToken() {
+        return token;
     }
 
+    public void setToken(String token) {
+        this.token = token;
+    }
     public Long getUserId() {
         return userId;
     }

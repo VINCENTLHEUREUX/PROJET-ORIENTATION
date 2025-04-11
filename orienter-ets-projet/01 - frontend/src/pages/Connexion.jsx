@@ -68,15 +68,22 @@ export default function Connexion() {
 
       const data = await response.json();
       
-      if (data.token) {
-        localStorage.setItem('authToken', data.token);
+      if (data.authToken) {
+        localStorage.setItem('authToken', data.authToken);
       }
 
       // Stocker les informations de l'utilisateur
-      login({
-        email: donneesConnexion.email,
-        token: data.token
-      });
+      const userData = {
+        token: data.authToken,
+        nom: data.nom,
+        prenom: data.prenom,
+        role: data.role
+      };
+      
+      // Sauvegarder dans localStorage
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      login(userData);
 
       setMessageSucces("Connexion réussie ! Redirection...");
       setErreurs({});
@@ -174,6 +181,3 @@ export default function Connexion() {
     </div>
   );
 }
-
-
-

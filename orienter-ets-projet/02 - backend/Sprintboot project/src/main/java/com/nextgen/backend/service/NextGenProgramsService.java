@@ -1,6 +1,6 @@
 package com.nextgen.backend.service;
 
-import com.nextgen.backend.model.ProgramInfo;
+import com.nextgen.backend.tables.ProgramInfo;
 
 import java.util.List;
 

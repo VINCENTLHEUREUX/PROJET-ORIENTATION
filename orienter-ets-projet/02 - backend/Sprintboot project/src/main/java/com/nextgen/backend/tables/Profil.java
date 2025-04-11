@@ -1,9 +1,17 @@
-package com.nextgen.backend.model;
+package com.nextgen.backend.tables;
 
-public class ProfilRequest {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="profil")
+public class Profil {
+    @Id
     private String email;
-    private String password;
-    private String pictureUrl;
+    @Column(name = "picture_url")
+    private String picture_url;
     private String biographie;
     private String etudes;
 
@@ -15,20 +23,12 @@ public class ProfilRequest {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getPictureUrl() {
-        return pictureUrl;
+        return picture_url;
     }
 
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
+    public void setPictureUrl(String picture_url) {
+        this.picture_url = picture_url;
     }
 
     public String getBiographie() {

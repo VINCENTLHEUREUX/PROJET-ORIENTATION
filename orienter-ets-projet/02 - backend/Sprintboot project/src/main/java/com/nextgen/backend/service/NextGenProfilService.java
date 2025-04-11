@@ -1,15 +1,13 @@
 package com.nextgen.backend.service;
 
-import com.nextgen.backend.model.Profil;
-import com.nextgen.backend.model.ProfilRequest;
-import com.nextgen.backend.model.User;
-
-import java.util.List;
+import com.nextgen.backend.tables.Profil;
+import com.nextgen.backend.tables.requests.ProfilRequest;
+import com.nextgen.backend.tables.User;
 
 public interface NextGenProfilService {
     public User getUserFromRequest(ProfilRequest requete);
     public Profil getProfilFromRequest(ProfilRequest requete);
-    public boolean createProfil(Profil profil);
-    public Profil getProfilByEmail(String email);
-    public boolean existsByEmail(String email);
+    public boolean saveProfil(Profil profil);
+    public Profil getProfilByToken(String token);
+    public boolean existsByToken(String token);
 }

@@ -1,71 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 import "../styles/orientation.css";
 
-const genies = {
-  genie_construction: [
-    "J'aime les chantiers et voir concrètement ce que je bâtis.",
-    "J'aime les structures, les ponts, les bâtiments.",
-    "Je m'intéresse aux matériaux comme le béton, l'acier ou le bois.",
-    "Je veux contribuer à rendre les infrastructures durables et sécuritaires.",
-    "Je suis à l'aise avec les normes, les plans et les devis techniques.",
-  ],
-  genie_electrique: [
-    "J'aime comprendre comment fonctionnent les circuits électriques.",
-    "L'électronique et les systèmes embarqués m'attirent.",
-    "J'aimerais travailler dans les énergies renouvelables ou les télécommunications.",
-    "J'aime les mathématiques appliquées aux signaux ou aux champs électromagnétiques.",
-    "Je suis curieux de savoir comment fonctionnent les capteurs, les moteurs et les réseaux électriques.",
-  ],
-  genie_logiciel: [
-    "J'aime coder et créer des logiciels utiles.",
-    "Je m'intéresse au développement d'applications Web, mobiles ou de jeux.",
-    "Je suis rigoureux et j'aime résoudre des bugs.",
-    "J'aimerais travailler dans le domaine de la cybersécurité ou de l'intelligence artificielle.",
-    "J'aime travailler en équipe sur des projets de programmation.",
-  ],
-  genie_mecanique: [
-    "Je suis fasciné par les machines, les moteurs et les systèmes mécaniques.",
-    "J'aime dessiner, concevoir ou modéliser des objets.",
-    "Je veux comprendre comment les choses bougent, roulent ou volent.",
-    "J'aime les matières comme la dynamique, la thermodynamique et la résistance des matériaux.",
-    "J'aimerais participer à la fabrication de prototypes ou de robots.",
-  ],
-  genie_production_automatisee: [
-    "Je suis attiré par l'automatisation et les robots industriels.",
-    "J'aime optimiser les processus pour les rendre plus efficaces.",
-    "Je veux apprendre à programmer des systèmes automatisés.",
-    "J'aime l'électronique, la mécanique et l'informatique combinées.",
-    "Je veux travailler dans l'industrie manufacturière ou la haute technologie.",
-  ],
-  genie_technologies_information: [
-    "J'aime l'informatique, mais avec une approche plus orientée systèmes.",
-    "Je m'intéresse aux réseaux, bases de données et à la cybersécurité.",
-    "J'aime comprendre comment les systèmes communiquent entre eux.",
-    "Je veux travailler en TI, mais pas nécessairement comme programmeur pur.",
-    "Je veux pouvoir toucher à plein de domaines en entreprise : infra, web, support, etc.",
-  ],
-  genie_operations_logistique: [
-    "J'aime planifier, organiser et optimiser les ressources.",
-    "Je suis intéressé par les chaînes d'approvisionnement et la gestion des stocks.",
-    "J'aime les systèmes complexes et le défi de les améliorer.",
-    "Je veux apprendre à utiliser des logiciels de gestion et de planification.",
-    "J'ai un bon sens de l'organisation et de l'analyse.",
-  ],
-  genie_aerospatial: [
-    "L'aéronautique me passionne : avions, drones, satellites.",
-    "J'aime les sciences appliquées au vol, comme l'aérodynamique.",
-    "Je suis rigoureux et méticuleux dans les détails techniques.",
-    "J'aimerais travailler pour des entreprises comme Airbus, Bombardier ou l'Agence spatiale.",
-    "Je veux contribuer à l'innovation dans l'espace ou l'aviation.",
-  ],
-};
-
 export default function FormulaireOrientation() {
   const navigate = useNavigate();
-  const cles = Object.keys(genies);
   const [etape, setEtape] = useState(0);
   const [reponses, setReponses] = useState({});
   const [envoye, setEnvoye] = useState(false);
@@ -73,6 +13,30 @@ export default function FormulaireOrientation() {
   const [erreur, setErreur] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [countdown, setCountdown] = useState(null);
+  const [genies, setGenies] = useState(null);
+  const [cles, setCles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const fetchQuestions = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8080/nextgen/questions');
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+      }
+      const data = await response.json();
+      setGenies(data);
+      setCles(Object.keys(data));
+      setLoading(false);
+    } catch (error) {
+      setErreur("Erreur lors du chargement des questions");
+      setLoading(false);
+    }
+  };
 
   const handleChange = (genie, index, value) => {
     setReponses((prev) => ({
@@ -93,14 +57,14 @@ export default function FormulaireOrientation() {
       resultats[genie] = total;
     });
     
-    const resultatgpa = resultats["genie_production_automatisee"] || 0;
-    const resultatmec = resultats["genie_mecanique"] || 0;
-    const resultatgti = resultats["genie_technologies_information"] || 0;
-    const resultatctn = resultats["genie_construction"] || 0;
-    const resultatele = resultats["genie_electrique"] || 0;
-    const resultataer = resultats["genie_aerospatial"] || 0;
-    const resultatgol = resultats["genie_operations_logistique"] || 0;
-    const resultatlog = resultats["genie_logiciel"] || 0;
+    const resultatgpa = resultats["GPA"] || 0;
+    const resultatmec = resultats["MEC"] || 0;
+    const resultatgti = resultats["GTI"] || 0;
+    const resultatctn = resultats["CTN"] || 0;
+    const resultatele = resultats["ELE"] || 0;
+    const resultataer = resultats["AER"] || 0;
+    const resultatgol = resultats["GOL"] || 0;
+    const resultatlog = resultats["LOG"] || 0;
     
     return { 
       resultats,
@@ -116,6 +80,8 @@ export default function FormulaireOrientation() {
   };
 
   const envoyer = async () => {
+    let userToken = localStorage.getItem('authToken');
+    
     setIsSubmitting(true);
     setErreur("");
     
@@ -133,33 +99,16 @@ export default function FormulaireOrientation() {
     
     setResultats(resultats);
     
-    const requestPayload = {
-      email: "admin@projetorientation.com",
-      password: "MotDePasseSecurise123",
-      resultatgpa: Number(resultatgpa || 0),
-      resultatmec: Number(resultatmec || 0), 
-      resultatgti: Number(resultatgti || 0), 
-      resultatctn: Number(resultatctn || 0), 
-      resultatele: Number(resultatele || 0), 
-      resultataer: Number(resultataer || 0), 
-      resultatgol: Number(resultatgol || 0), 
-      resultatlog: Number(resultatlog || 0)
-    };
-    
-    console.log("Sending data to server:", requestPayload);
-    
     try {
       const response = await fetch('http://localhost:8080/nextgen/result', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Authorization': `Bearer ${userToken || ''}`
         },
-        credentials: 'include',
         body: JSON.stringify({
-          "email": "admin@projetorientation.com",
-          "password": "MotDePasseSecurise123",
+          "token": userToken,
           "resultatGPA": Number(resultatgpa || 0),
           "resultatMEC": Number(resultatmec || 0), 
           "resultatGTI": Number(resultatgti || 0), 
@@ -171,17 +120,8 @@ export default function FormulaireOrientation() {
         })
       });
       
-      // Log response information for debugging
-      console.log("Response status:", response.status);
-      const responseData = await response.text();
-      console.log("Response body:", responseData);
-      
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${responseData || 'Unknown error'}`);
-      }
-      
-      if (!response.ok) {
-        throw new Error('Erreur lors de l\'envoi des résultats');
+        throw new Error("Erreur lors de l'envoi des résultats");
       }
       
       setEnvoye(true);
@@ -205,12 +145,14 @@ export default function FormulaireOrientation() {
         });
       }, 1000);
     } catch (error) {
-      setErreur(error.message || "Une erreur est survenue");
+      setErreur("Une erreur est survenue");
       setIsSubmitting(false);
     }
   };
 
   const suivant = () => {
+    if (!genies || !cles.length) return;
+    
     const reponseEtapeActuelle = reponses[cles[etape]] || {};
     const toutesRepondues = genies[cles[etape]].every((_, idx) => 
       reponseEtapeActuelle[idx] !== undefined && reponseEtapeActuelle[idx] !== ""
@@ -247,25 +189,46 @@ export default function FormulaireOrientation() {
     });
   };
 
-  const getGenieRecommande = () => {
-    if (!resultats) return null;
+  const formatNomGenie = (code) => {
+    const mapping = {
+      "LOG": "Génie logiciel",
+      "GOL": "Génie des opérations et de la logistique",
+      "GPA": "Génie de la production automatisée",
+      "MEC": "Génie mécanique",
+      "CTN": "Génie de la construction",
+      "GTI": "Génie des technologies de l'information",
+      "AER": "Génie aérospatial",
+      "ELE": "Génie électrique"
+    };
     
-    let maxScore = 0;
-    let genieRecommande = "";
-    
-    Object.entries(resultats).forEach(([genie, score]) => {
-      if (score > maxScore) {
-        maxScore = score;
-        genieRecommande = genie;
-      }
-    });
-    
-    return genieRecommande.replace('_', ' ');
+    return mapping[code] || code;
   };
 
-  const formatNomGenie = (nom) => {
-    return nom.replace('genie_', 'Génie ').replace(/_/g, ' ');
-  };
+  if (loading) {
+    return (
+      <div className="page-orientation">
+        <Header />
+        <main className="main-content">
+          <div className="loading">Chargement du questionnaire...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!genies || !cles.length) {
+    return (
+      <div className="page-orientation">
+        <Header />
+        <main className="main-content">
+          <div className="error">
+            <p>{erreur || "Impossible de charger les questions. Veuillez réessayer plus tard."}</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="page-orientation">
@@ -285,12 +248,12 @@ export default function FormulaireOrientation() {
                 </span>
               </div>
               
-              <h3 className="text-xl font-semibold mb-6">
+              <h3 className="section-title">
                 {formatNomGenie(cles[etape])}
               </h3>
 
               {genies[cles[etape]].map((q, idx) => (
-                <div key={idx} className="mb-6">
+                <div key={idx} className="question-item">
                   <p className="question-text">
                     {etape * 5 + idx + 1}. {q}
                   </p>
@@ -325,7 +288,7 @@ export default function FormulaireOrientation() {
                 </div>
               ))}
 
-              {erreur && <div className="error-message">{erreur}</div>}
+              {erreur && <div className="error-inline">{erreur}</div>}
 
               <div className="progress-container">
                 <div className="progress-bar">
@@ -363,12 +326,8 @@ export default function FormulaireOrientation() {
         ) : (
           <div className="results-container">
             <div className="results-header">
-              <h1 className="text-2xl font-bold text-ets-red mb-2">
-                Résultat de votre orientation
-              </h1>
-              <p className="text-gray-600">
-                Voici le programme qui correspond le mieux à votre profil
-              </p>
+              <h1>Résultat de votre orientation</h1>
+              <p>Voici le programme qui correspond le mieux à votre profil</p>
             </div>
 
             <div className="results-list">
@@ -378,7 +337,7 @@ export default function FormulaireOrientation() {
                     current[1] > max[1] ? current : max
                   );
                 const [genie, score] = maxEntry;
-                const pourcentage = Math.round((score / 25) * 100); // 25 est le score maximum possible (5 questions × 5 points)
+                const pourcentage = Math.round((score / 25) * 100);
                 
                 return (
                   <div key={genie} className="result-item">
@@ -390,17 +349,15 @@ export default function FormulaireOrientation() {
             </div>
 
             <div className="recommendation-section">
-              <h3 className="text-lg font-semibold mb-2">
-                Programme recommandé
-              </h3>
-              <p className="mb-4">
+              <h3>Programme recommandé</h3>
+              <p>
                 Selon vos réponses, ce programme correspond le mieux à votre profil.
                 Nous vous encourageons à explorer les détails de ce programme ainsi que d'autres
                 qui pourraient vous intéresser.
               </p>
             </div>
 
-            <div className="mt-8 text-center">
+            <div className="action-buttons">
               <button
                 onClick={allerAuxFormations}
                 className="nav-button button-next"
