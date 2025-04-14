@@ -7,7 +7,11 @@ import com.nextgen.backend.repository.NextGenProfilRepository;
 import com.nextgen.backend.repository.NextGenUserRepository;
 import com.nextgen.backend.service.NextGenProfilService;
 import org.springframework.stereotype.Service;
-    // Gestion des opérations a la table Profil de la DB
+
+import java.util.Collections;
+import java.util.List;
+
+// Gestion des opérations a la table Profil de la DB
 @Service
 public class NextGenProfilServiceImpl implements NextGenProfilService {
 
@@ -53,5 +57,23 @@ public class NextGenProfilServiceImpl implements NextGenProfilService {
         profil.setEmail(nextGenUserRepository.getUserByToken(requete.getToken()).getEmail());
         profil.setPictureUrl(requete.getPictureUrl());
         return profil;
+    }
+
+    public boolean isAdmin(String token){
+        if (nextGenUserRepository.existsByToken(token)){
+            User user = nextGenUserRepository.getUserByToken(token);
+            return user.getRole().equals("Administrateur");
+        }
+        return false;
+    }
+
+    public List<Profil> getAllProfils(String token) {
+        if (isAdmin(token)){
+            return nextGenProfilRepository.findAll();
+        }
+        return Collections.emptyList();
+    }
+    public Profil getProfilByEmail(String email){
+        return nextGenProfilRepository.findProfilByEmail(email);
     }
 }

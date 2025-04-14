@@ -9,4 +9,6 @@ public interface NextGenUserRepository extends JpaRepository<User, Long> {
     User getUserByEmail(String email);
     boolean deleteByEmail(String email);
     User getUserByToken(String token);
+
+    boolean existsByToken(String token);
 }

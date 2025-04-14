@@ -11,6 +11,8 @@ public class ResultatRequest {
     private int resultatGTI;
     private String token;
 
+    private long resultId;
+
     public ResultatRequest(){
 
     }
@@ -85,5 +87,13 @@ public class ResultatRequest {
 
     public void setResultatGTI(int resultatGTI) {
         this.resultatGTI = resultatGTI;
+    }
+
+    public long getResultId() {
+        return resultId;
+    }
+
+    public void setResultId(long resultId) {
+        this.resultId = resultId;
     }
 }

@@ -7,6 +7,7 @@ import Inscription from "./pages/Inscription";
 import Orientation from "./pages/Orientation";
 import Formations from "./pages/Formations";
 import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
 import PrivateRoute from './components/PrivateRoute';
 
 const App = () => {
@@ -19,7 +20,8 @@ const App = () => {
           <Route path="/inscription" element={<Inscription />} />
           <Route path="/orientation" element={<Orientation />} />
           <Route path="/formations" element={<Formations />} />
-          <Route path="/profil" element={<PrivateRoute> <Profile /> </PrivateRoute>  } />
+          <Route path="/profil" element={<PrivateRoute> <Profile /> </PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute requireAdmin={true}> <Admin /> </PrivateRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

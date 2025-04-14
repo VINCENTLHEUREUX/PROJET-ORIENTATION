@@ -3,6 +3,8 @@ package com.nextgen.backend.service.impl;
 import com.nextgen.backend.tables.ProgramInfo;
 import com.nextgen.backend.repository.NextGenProgramsRepository;
 import com.nextgen.backend.service.NextGenProgramsService;
+import com.nextgen.backend.tables.requests.ProgramRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,6 +57,7 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
         nextGenProgramsRepository.save(program);
         return true;
     }
+    @Transactional
     public boolean deleteProgram(ProgramInfo program){
         ProgramInfo programmeCopie;
         if (!existsBySigle(program.getSigle())){
@@ -69,5 +72,16 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
     }
     public List<ProgramInfo> findAllPrograms(){
         return nextGenProgramsRepository.findAll();
+    }
+
+    @Override
+    public ProgramInfo getProgramFromRequest(ProgramRequest request) {
+        ProgramInfo programme = new ProgramInfo();
+        programme.setCredits(request.getCredits());
+        programme.setDescription(request.getDescription());
+        programme.setSigle(request.getSigle());
+        programme.setNom(request.getNom());
+        programme.setUrl(request.getUrl());
+        return programme;
     }
 }

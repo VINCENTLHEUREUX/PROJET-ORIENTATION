@@ -9,6 +9,9 @@ import com.nextgen.backend.service.NextGenUserService;
 import org.springframework.stereotype.Service;
 import com.nextgen.backend.repository.NextGenResultatRepository;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 public class NextGenResultatServiceImpl implements NextGenResultatService {
     NextGenResultatRepository nextGenResultatRepository;
@@ -28,13 +31,6 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
     }
 
 
-    public boolean existsByResultId(Long resultId){
-        if (findByResultId(resultId) != null){
-            return true;
-        }
-        return false;
-    }
-
     public boolean createResult(ResultatQuizz result) {
             ResultatQuizz saved = nextGenResultatRepository.save(result);
             return true;
@@ -43,7 +39,7 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
     public boolean deleteByResultId(long resultId){
         ResultatQuizz quizzCopie;
 
-        if (!existsByResultId(resultId)) {
+        if (!existsById(resultId)) {
             return false;
         }
 
@@ -51,6 +47,21 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         nextGenResultatRepository.delete(quizzCopie);
         return true;
     }
+
+    @Override
+    public boolean updateById(ResultatQuizz resultat) {
+        if (!existsById(resultat.getResultId())) {
+            return false;
+        }
+        nextGenResultatRepository.save(resultat);
+        return true;
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return nextGenResultatRepository.existsById(id);
+    }
+
     public ResultatQuizz findTopByEmailOrderByTimeDesc(String email){
         return nextGenResultatRepository.findTopByEmailOrderByTimeDesc(email);
     }
@@ -68,6 +79,7 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         resultatQuizz.setResultatCTN(resultatRequest.getResultatCTN());
         resultatQuizz.setResultatGPA(resultatRequest.getResultatGPA());
         resultatQuizz.setResultatGTI(resultatRequest.getResultatGTI());
+        resultatQuizz.setResultId(resultatRequest.getResultId());
         resultatQuizz.setEmail(nextGenUserService.getUserByToken(resultatRequest.getToken()).getEmail());
         return resultatQuizz;
     }
@@ -75,6 +87,13 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         User user = new User();
         user.setToken(resultatRequest.getToken());
             return user;
+    }
+
+    public List<ResultatQuizz> getAllResults(String token) {
+        if (nextGenUserService.isAdmin(token)){
+            return nextGenResultatRepository.findAll();
+        }
+        return Collections.emptyList();
     }
 
 }

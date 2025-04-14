@@ -7,4 +7,5 @@ public interface NextGenResultatRepository extends JpaRepository<ResultatQuizz, 
     ResultatQuizz findByResultId (long resultId);
     ResultatQuizz findTopByEmailOrderByTimeDesc(String email);
     boolean existsByEmail(String email);
+
 }

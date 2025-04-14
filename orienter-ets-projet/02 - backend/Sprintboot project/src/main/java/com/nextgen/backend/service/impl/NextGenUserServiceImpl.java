@@ -8,6 +8,8 @@ import com.nextgen.backend.service.NextGenUserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -26,6 +28,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
 
     @Override
     public boolean createUser(User user) {
+        String token = UUID.randomUUID().toString();
         if (existsByEmail(user.getEmail())){
             return false;
         }
@@ -37,6 +40,9 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         }
         Profil profil = new Profil();
         profil.setEmail(user.getEmail());
+        user.setDate(LocalDate.now());
+        user.setRole("Utilisateur"); // Puisque cette méthode sert au utilisateurs
+        user.setToken(token);
         if (nextGenProfilService.saveProfil(profil)){
             nextGenUserRepository.save(user);
             return true;
@@ -47,9 +53,17 @@ public class NextGenUserServiceImpl implements NextGenUserService {
     @Override
     public boolean updateUser(User user) {
         User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
-        if (existsByEmail(user.getEmail()) && user.getPassword().equals(userSave.getPassword())){
+        if (!isAdmin(user.getToken())){ // Seulement les admins peuvent udpate
+            return false;
+        }
+        user.setToken(userSave.getToken()); // Important ici de garder le token
+        if (user.getPassword() == null){
+            user.setPassword(userSave.getPassword());
+        }
+        else{
 
-
+        }
+        if (existsByEmail(user.getEmail())){
             user.setUserId(userSave.getUserId());
             nextGenUserRepository.save(user);
             return true;
@@ -60,12 +74,15 @@ public class NextGenUserServiceImpl implements NextGenUserService {
     @Override
     @Transactional
     public boolean deleteUser(User user) {
-        if (user == null || user.getEmail() == null || user.getPassword() == null) {
+        if (!isAdmin(user.getToken())){
+            return false;
+        }
+        if (user == null || user.getEmail() == null) {
             return false;
         }
         User oldUser = getUserByEmail(user.getEmail());
 
-        if (oldUser == null || !user.getPassword().equals(oldUser.getPassword())) {
+        if (oldUser == null) {
             return false;
         }
             nextGenUserRepository.delete(oldUser);
@@ -87,17 +104,10 @@ public class NextGenUserServiceImpl implements NextGenUserService {
 
     @Override
     public boolean existsByEmail(String email) {
-        //Insérer la logique supplémentaire ici
-
         return nextGenUserRepository.existsByEmail(email);
     }
 
-    @Override
-    public List<User> getAllUsers() {
-        //Insérer la logique supplémentaire ici
 
-        return nextGenUserRepository.findAll();
-    }
 
     public boolean isValidEmail(String email) {
         if (email == null || email.isEmpty()) {
@@ -155,12 +165,22 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         return true;
     }
 
-    // Validate a token and return the associated email
     public User getUserByToken(String token) {
         return nextGenUserRepository.getUserByToken(token);
     }
 
-    // Invalidate a token (for logout)
-    public void invalidateToken(String token) {
+    public boolean isAdmin(String token){
+        if (nextGenUserRepository.existsByToken(token)){
+            User user = nextGenUserRepository.getUserByToken(token);
+            return user.getRole().equals("Administrateur");
+        }
+        return false;
+    }
+
+    public List<User> getAllUsers(String token) {
+        if (isAdmin(token)){
+            return nextGenUserRepository.findAll();
+        }
+        return Collections.emptyList();
     }
 }

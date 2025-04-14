@@ -70,7 +70,7 @@ export default function Formations() {
   }, [fromOrientation]);
   
   const getCompatibilityPercentage = (formationId) => {
-    if (!orientationResults || !showResults) return 0;
+    if (!orientationResults) return 0;
     const score = orientationResults[`resultat${formationId.toLowerCase()}`] || 0;
     return Math.round(((score-5)/ 20) * 100); 
   };
@@ -111,8 +111,13 @@ export default function Formations() {
           valueB = typeof b.credits === 'number' ? b.credits : 0;
           break;
         case 'compatibility':
-          valueA = getCompatibilityPercentage(a.id);
-          valueB = getCompatibilityPercentage(b.id);
+          if (orientationResults) {
+            valueA = getCompatibilityPercentage(a.id);
+            valueB = getCompatibilityPercentage(b.id);
+          } else {
+            valueA = a.titre.toLowerCase();
+            valueB = b.titre.toLowerCase();
+          }
           break;
         default:
           valueA = a.titre.toLowerCase();
@@ -125,16 +130,7 @@ export default function Formations() {
         return valueA < valueB ? 1 : -1;
       }
     });
-  }, [filteredFormations, sortBy, sortOrder]);
-  
-  const handleSortChange = (critere) => {
-    if (sortBy === critere) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortBy(critere);
-      setSortOrder(critere === 'compatibility' ? 'desc' : 'asc');
-    }
-  };
+  }, [filteredFormations, sortBy, sortOrder, orientationResults]);
   
   const resetSort = () => {
     setSortBy('compatibility');

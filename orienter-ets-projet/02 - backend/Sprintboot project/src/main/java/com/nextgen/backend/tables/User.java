@@ -23,10 +23,8 @@ public class User {
     private String token;
     private String nom;
     private String prenom;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String role = "Utilisateur";
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private LocalDate date = LocalDate.now();
+    private String role;
+    private LocalDate date;
 
 
     public User(){}

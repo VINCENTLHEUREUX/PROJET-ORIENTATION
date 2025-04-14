@@ -1,70 +1,83 @@
-import React, { useState, useEffect } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom";
-import "../styles/orientation.css";
+import React, { useState, useEffect } from "react"
+import Header from "../components/Header"
+import Footer from "../components/Footer"
+import { useNavigate } from "react-router-dom"
+import "../styles/orientation.css"
 
 export default function FormulaireOrientation() {
-  const navigate = useNavigate();
-  const [etape, setEtape] = useState(0);
-  const [reponses, setReponses] = useState({});
-  const [envoye, setEnvoye] = useState(false);
-  const [resultats, setResultats] = useState(null);
-  const [erreur, setErreur] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countdown, setCountdown] = useState(null);
-  const [genies, setGenies] = useState(null);
-  const [cles, setCles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate()
+  
+  const [etape, setEtape] = useState(0)
+  const [reponses, setReponses] = useState({})
+  const [envoye, setEnvoye] = useState(false)
+  const [resultats, setResultats] = useState(null)
+  const [erreur, setErreur] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [countdown, setCountdown] = useState(null)
+  const [genies, setGenies] = useState(null)
+  const [cles, setCles] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchQuestions();
-  }, []);
+    fetchQuestions()
+  }, [])
 
-  const fetchQuestions = async () => {
-    setLoading(true);
+  // Récupère les questions
+const fetchQuestions = async () => {
+    setLoading(true)
     try {
-      const response = await fetch('http://localhost:8080/nextgen/questions');
+      const response = await fetch('http://localhost:8080/nextgen/questions')
       if (!response.ok) {
-        throw new Error(`Error ${response.status}`);
+        throw new Error(`Error ${response.status}`)
       }
-      const data = await response.json();
-      setGenies(data);
-      setCles(Object.keys(data));
-      setLoading(false);
+      const data = await response.json()
+      
+      const questionsByProgram = {}
+      data.questions.forEach(q => {
+        if (!questionsByProgram[q.sigle]) {
+          questionsByProgram[q.sigle] = []
+        }
+        questionsByProgram[q.sigle].push(q.description)
+      })
+      
+      setGenies(questionsByProgram)
+      setCles(Object.keys(questionsByProgram))
+      setLoading(false)
     } catch (error) {
-      setErreur("Erreur lors du chargement des questions");
-      setLoading(false);
+      setErreur("Erreur lors du chargement des questions")
+      setLoading(false)
     }
-  };
+  }
 
-  const handleChange = (genie, index, value) => {
+  // Enregistre les réponses
+const handleChange = (genie, index, value) => {
     setReponses((prev) => ({
       ...prev,
       [genie]: {
         ...(prev[genie] || {}),
         [index]: Number(value),
       },
-    }));
-  };
+    }))
+  }
 
-  const calculerResultats = () => {
-    const resultats = {};
+  // Calcule les scores pour chaque programme d'ingénierie, a mettre a jour si modification des programmes
+const calculerResultats = () => {
+    const resultats = {}
     
     Object.keys(reponses).forEach((genie) => {
-      const reponseGenie = reponses[genie];
-      const total = Object.values(reponseGenie).reduce((sum, note) => sum + note, 0);
-      resultats[genie] = total;
-    });
+      const reponseGenie = reponses[genie]
+      const total = Object.values(reponseGenie).reduce((sum, note) => sum + note, 0)
+      resultats[genie] = total
+    })
     
-    const resultatgpa = resultats["GPA"] || 0;
-    const resultatmec = resultats["MEC"] || 0;
-    const resultatgti = resultats["GTI"] || 0;
-    const resultatctn = resultats["CTN"] || 0;
-    const resultatele = resultats["ELE"] || 0;
-    const resultataer = resultats["AER"] || 0;
-    const resultatgol = resultats["GOL"] || 0;
-    const resultatlog = resultats["LOG"] || 0;
+    const resultatgpa = resultats["GPA"] || 0
+    const resultatmec = resultats["MEC"] || 0
+    const resultatgti = resultats["GTI"] || 0
+    const resultatctn = resultats["CTN"] || 0
+    const resultatele = resultats["ELE"] || 0
+    const resultataer = resultats["AER"] || 0
+    const resultatgol = resultats["GOL"] || 0
+    const resultatlog = resultats["LOG"] || 0
     
     return { 
       resultats,
@@ -76,14 +89,15 @@ export default function FormulaireOrientation() {
       resultataer, 
       resultatgol, 
       resultatlog
-    };
-  };
+    }
+  }
 
-  const envoyer = async () => {
-    let userToken = localStorage.getItem('authToken');
+  // Envoie les résultats au serveur, a mettre a jour si modification des programmes
+const envoyer = async () => {
+    let userToken = localStorage.getItem('authToken')
     
-    setIsSubmitting(true);
-    setErreur("");
+    setIsSubmitting(true)
+    setErreur("")
     
     const { 
       resultats,
@@ -95,9 +109,9 @@ export default function FormulaireOrientation() {
       resultataer, 
       resultatgol, 
       resultatlog
-    } = calculerResultats();
+    } = calculerResultats()
     
-    setResultats(resultats);
+    setResultats(resultats)
     
     try {
       const response = await fetch('http://localhost:8080/nextgen/result', {
@@ -118,19 +132,19 @@ export default function FormulaireOrientation() {
           "resultatGOL": Number(resultatgol || 0), 
           "resultatLOG": Number(resultatlog || 0)
         })
-      });
+      })
       
       if (!response.ok) {
-        throw new Error("Erreur lors de l'envoi des résultats");
+        throw new Error("Erreur lors de l'envoi des résultats")
       }
       
-      setEnvoye(true);
-      setCountdown(5);
+      setEnvoye(true)
+      setCountdown(5)
       
       const timer = setInterval(() => {
         setCountdown(prev => {
           if (prev <= 1) {
-            clearInterval(timer);
+            clearInterval(timer)
             navigate('/formations', { 
               state: { 
                 fromOrientation: true,
@@ -138,47 +152,50 @@ export default function FormulaireOrientation() {
                   scores: resultats
                 }
               } 
-            });
-            return 0;
+            })
+            return 0
           }
-          return prev - 1;
-        });
-      }, 1000);
+          return prev - 1
+        })
+      }, 1000)
     } catch (error) {
-      setErreur("Une erreur est survenue");
-      setIsSubmitting(false);
+      setErreur("Une erreur est survenue")
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  const suivant = () => {
-    if (!genies || !cles.length) return;
+  // Passe à la section suivante ou finalise le questionnaire
+const suivant = () => {
+    if (!genies || !cles.length) return
     
-    const reponseEtapeActuelle = reponses[cles[etape]] || {};
+    const reponseEtapeActuelle = reponses[cles[etape]] || {}
     const toutesRepondues = genies[cles[etape]].every((_, idx) => 
       reponseEtapeActuelle[idx] !== undefined && reponseEtapeActuelle[idx] !== ""
-    );
+    )
     
     if (!toutesRepondues) {
-      setErreur("Veuillez répondre à toutes les questions avant de continuer.");
-      return;
+      setErreur("Veuillez répondre à toutes les questions avant de continuer")
+      return
     }
     
-    setErreur("");
+    setErreur("")
     if (etape < cles.length - 1) {
-      setEtape(etape + 1);
+      setEtape(etape + 1)
     } else {
-      envoyer();
+      envoyer()
     }
-  };
+  }
 
-  const precedent = () => {
+  // Retourne à la section précédente
+const precedent = () => {
     if (etape > 0) {
-      setEtape(etape - 1);
-      setErreur("");
+      setEtape(etape - 1)
+      setErreur("")
     }
-  };
+  }
 
-  const allerAuxFormations = () => {
+  // Navigue vers la page des détails de formation avec les résultats
+const allerAuxFormations = () => {
     navigate('/formations', { 
       state: { 
         fromOrientation: true,
@@ -186,10 +203,12 @@ export default function FormulaireOrientation() {
           scores: resultats
         }
       } 
-    });
-  };
+    })
+  }
 
-  const formatNomGenie = (code) => {
+  // Convertit les codes de programme en noms complets de programme (a mettre a jour si update du backend)
+  
+const formatNomGenie = (code) => {
     const mapping = {
       "LOG": "Génie logiciel",
       "GOL": "Génie des opérations et de la logistique",
@@ -199,10 +218,10 @@ export default function FormulaireOrientation() {
       "GTI": "Génie des technologies de l'information",
       "AER": "Génie aérospatial",
       "ELE": "Génie électrique"
-    };
+    }
     
-    return mapping[code] || code;
-  };
+    return mapping[code] || code
+  }
 
   if (loading) {
     return (
@@ -213,7 +232,7 @@ export default function FormulaireOrientation() {
         </main>
         <Footer />
       </div>
-    );
+    )
   }
 
   if (!genies || !cles.length) {
@@ -227,7 +246,7 @@ export default function FormulaireOrientation() {
         </main>
         <Footer />
       </div>
-    );
+    )
   }
 
   return (
@@ -335,25 +354,25 @@ export default function FormulaireOrientation() {
                 const maxEntry = Object.entries(resultats)
                   .reduce((max, current) => 
                     current[1] > max[1] ? current : max
-                  );
-                const [genie, score] = maxEntry;
-                const pourcentage = Math.round((score / 25) * 100);
+                  )
+                const [genie, score] = maxEntry
+                const pourcentage = Math.round((score / 25) * 100)
                 
                 return (
                   <div key={genie} className="result-item">
                     <span className="program-name">{formatNomGenie(genie)}</span>
                     <span className="program-score">{pourcentage}%</span>
                   </div>
-                );
+                )
               })()}
             </div>
 
             <div className="recommendation-section">
               <h3>Programme recommandé</h3>
               <p>
-                Selon vos réponses, ce programme correspond le mieux à votre profil.
+                Selon vos réponses, ce programme correspond le mieux à votre profil
                 Nous vous encourageons à explorer les détails de ce programme ainsi que d'autres
-                qui pourraient vous intéresser.
+                qui pourraient vous intéresser
               </p>
             </div>
 
@@ -370,5 +389,5 @@ export default function FormulaireOrientation() {
       </main>
       <Footer />
     </div>
-  );
+  )
 }

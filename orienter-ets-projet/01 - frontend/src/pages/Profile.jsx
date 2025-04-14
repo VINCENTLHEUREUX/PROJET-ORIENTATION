@@ -1,149 +1,150 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import '../styles/profil.css';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import Header from '../components/Header'
+import Footer from '../components/Footer'
+import '../styles/profil.css'
+import { useAuth } from '../context/AuthContext'
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [userInfo, setUserInfo] = useState(user || null);
-  const [orientationResults, setOrientationResults] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [profilePicUrl, setProfilePicUrl] = useState('https://i.pinimg.com/1200x/46/72/f8/4672f876389036583190d93a71aa6cb2.jpg');
-  const [isEditingPic, setIsEditingPic] = useState(false);
-  const [biographie, setBiographie] = useState('');
-  const [etudes, setEtudes] = useState('');
-  const [isEditingBio, setIsEditingBio] = useState(false);
-  const [isEditingEtudes, setIsEditingEtudes] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [prenom, setPrenom] = useState(user?.prenom || '');
-  const [nom, setNom] = useState(user?.nom || '');
+  const navigate = useNavigate()
+  const { user } = useAuth()
+  
+  const [userInfo, setUserInfo] = useState(user || null)
+  const [orientationResults, setOrientationResults] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [profilePicUrl, setProfilePicUrl] = useState('https://i.pinimg.com/1200x/46/72/f8/4672f876389036583190d93a71aa6cb2.jpg')
+  const [prenom, setPrenom] = useState(user?.prenom || '')
+  const [nom, setNom] = useState(user?.nom || '')
+  const [biographie, setBiographie] = useState('')
+  const [etudes, setEtudes] = useState('')
+  
+  const [isEditingPic, setIsEditingPic] = useState(false)
+  const [isEditingBio, setIsEditingBio] = useState(false)
+  const [isEditingEtudes, setIsEditingEtudes] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    fetchUserData()
+  }, [])
 
+  // Récupère les données utilisateur
   const fetchUserData = async () => {
     try {
-      const authToken = localStorage.getItem('authToken');
+      const authToken = localStorage.getItem('authToken')
       const headers = {
         'Authorization': `Bearer ${authToken}`,
         'Content-Type': 'application/json'
-      };
+      }
   
-      const storedUser = localStorage.getItem('user');
+      const storedUser = localStorage.getItem('user')
       if (storedUser) {
-        const userData = JSON.parse(storedUser);
-        setUserInfo(userData);
-        if (userData.nom) setNom(userData.nom);
-        if (userData.prenom) setPrenom(userData.prenom);
+        const userData = JSON.parse(storedUser)
+        setUserInfo(userData)
+        if (userData.nom) setNom(userData.nom)
+        if (userData.prenom) setPrenom(userData.prenom)
       }
   
       const profileResponse = await axios.post('/api/profil', {
         token: authToken
-      }, { headers });
+      }, { headers })
   
       if (profileResponse.data) {
-        const profileData = profileResponse.data;
+        const profileData = profileResponse.data
         
         if (profileData.picture_url && profileData.picture_url !== 'calisse') {
-          setProfilePicUrl(profileData.picture_url);
+          setProfilePicUrl(profileData.picture_url)
         }
         
         if (profileData.biographie) {
-          setBiographie(profileData.biographie);
+          setBiographie(profileData.biographie)
         }
         
         if (profileData.etudes) {
-          setEtudes(profileData.etudes);
+          setEtudes(profileData.etudes)
         }
         
-        if (profileData.nom) setNom(profileData.nom);
-        if (profileData.prenom) setPrenom(profileData.prenom);
+        if (profileData.nom) setNom(profileData.nom)
+        if (profileData.prenom) setPrenom(profileData.prenom)
         if (profileData.email) {
           setUserInfo(prevUserInfo => ({
             ...prevUserInfo,
             email: profileData.email
-          }));
+          }))
         }
       }
   
       const orientationResponse = await axios.post('/api/results', {
         token: authToken
-      }, { headers });
+      }, { headers })
       
-      setOrientationResults(orientationResponse.data);
+      setOrientationResults(orientationResponse.data)
     } catch (err) {
-      setError('Erreur lors de la récupération des données, avez vous fait le test?');
-      console.error('Erreur:', err);
+      setError('Erreur lors de la récupération des données, avez vous fait le test?')
+      console.error('Erreur:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
+  // Gère le changement d'URL de photo
   const handlePicChange = (e) => {
-    setProfilePicUrl(e.target.value);
-    setHasChanges(true);
-  };
+    setProfilePicUrl(e.target.value)
+    setHasChanges(true)
+  }
 
+  // Gère les modifications de la biographie
   const handleBiographieChange = (e) => {
-    setBiographie(e.target.value);
-    setHasChanges(true);
-  };
+    setBiographie(e.target.value)
+    setHasChanges(true)
+  }
 
+  // Gère les modifications des études
   const handleEtudesChange = (e) => {
-    setEtudes(e.target.value);
-    setHasChanges(true);
-  };
+    setEtudes(e.target.value)
+    setHasChanges(true)
+  }
 
+  // Sauvegarde toutes les modifications du profil
   const saveAllChanges = async () => {
     try {
-      const authToken = localStorage.getItem('authToken');
-      const headers = {
-        'Authorization': `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      };
-
+      const authToken = localStorage.getItem('authToken')
       const response = await axios.put('/api/profil', {
         token: authToken,
         pictureUrl: profilePicUrl,
         biographie,
         etudes
-      }, { headers });
+      }, { headers })
 
       if (response.data) {
-        const userData = userInfo ? {...userInfo} : {};
-        userData.picture_url = profilePicUrl;
-        userData.biographie = biographie;
-        userData.etudes = etudes;
-        localStorage.setItem('user', JSON.stringify(userData));
+        const userData = userInfo ? {...userInfo} : {}
+        userData.picture_url = profilePicUrl
+        userData.biographie = biographie
+        userData.etudes = etudes
+        localStorage.setItem('user', JSON.stringify(userData))
         
-        setIsEditingPic(false);
-        setIsEditingBio(false);
-        setIsEditingEtudes(false);
-        setHasChanges(false);
+        setIsEditingPic(false)
+        setIsEditingBio(false)
+        setIsEditingEtudes(false)
+        setHasChanges(false)
       }
     } catch (err) {
-      console.error('Erreur lors de la mise à jour du profil:', err);
+      console.error('Erreur lors de la mise à jour du profil:', err)
     }
-  };
+  }
 
+  // Formate le nom du programme d'ingénierie. Serait pertinent de retourner seulement le sigle du backend pour eviter ceci.
   const formatNomGenie = (nom) => {
     return nom
       .replace('resultat', '')
-      .split(/(?=[A-Z])/)
-      .join(' ')
-      .toLowerCase()
-      .replace(/\b\w/g, l => l.toUpperCase());
-  };
+      .toUpperCase()
+      }
 
+  // Calcule le pourcentage de correspondance pour un programme
   const calculatePercentage = (score) => {
-    return Math.round(((score -5)/ 20) * 100);
-  };
+    return Math.round(((score -5)/ 20) * 100)
+  }
 
   if (loading) {
     return (
@@ -154,7 +155,7 @@ export default function Profile() {
         </main>
         <Footer />
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -166,7 +167,7 @@ export default function Profile() {
         </main>
         <Footer />
       </div>
-    );
+    )
   }
 
   return (
@@ -180,8 +181,8 @@ export default function Profile() {
             <div className="profile-pic-container">
               <div className="profile-pic-circle">
                 <img src={profilePicUrl} alt="Photo de profil" className="profile-pic" onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "https://i.pinimg.com/1200x/46/72/f8/4672f876389036583190d93a71aa6cb2.jpg";
+                  e.target.onerror = null
+                  e.target.src = "https://i.pinimg.com/1200x/46/72/f8/4672f876389036583190d93a71aa6cb2.jpg"
                 }} />
               </div>
               
@@ -245,7 +246,7 @@ export default function Profile() {
                   </button>
                 </div>
               ) : (
-                <p className="bio-text">{biographie || "Aucune biographie ajoutée."}</p>
+                <p className="bio-text">{biographie || "Aucune biographie ajoutée"}</p>
               )}
             </div>
 
@@ -272,7 +273,7 @@ export default function Profile() {
                   </button>
                 </div>
               ) : (
-                <p className="etudes-text">{etudes || "Aucune information sur les études ajoutée."}</p>
+                <p className="etudes-text">{etudes || "Aucune information sur les études ajoutée"}</p>
               )}
             </div>
 
@@ -317,5 +318,5 @@ export default function Profile() {
       </main>
       <Footer />
     </div>
-  );
+  )
 }
