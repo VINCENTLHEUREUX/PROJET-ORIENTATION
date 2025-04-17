@@ -67,7 +67,7 @@ export default function Admin() {
     }
   };
 
-  // Récupère les questions 
+  // Récupère les questions
   const fetchQuestionsData = async () => {
     setLoading(true);
     setError(null);
@@ -461,7 +461,7 @@ export default function Admin() {
         prenom: user.prenom || '',
         email: user.email || '',
         password: '',
-        role: user.role || 'Utilisateur', // Load existing role for editing
+        role: user.role || 'Utilisateur',
         date: user.date
     });
     setIsEditMode(true);
@@ -573,7 +573,7 @@ export default function Admin() {
     setNewProfil(initialProfilState);
   };
 
-  // Soumet le formulaire du profil
+  // Soumet le formulaire du profil (Modification uniquement)
   const handleSubmitProfil = async (e) => {
     e.preventDefault();
     if (!isEditMode) return;
@@ -604,24 +604,6 @@ export default function Admin() {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Gère la suppression du profil
-  const handleDeleteProfil = async (email) => {
-      setLoading(true);
-      setError(null);
-      const authToken = localStorage.getItem('authToken');
-      if (!authToken) { setError('Authentification requise'); setLoading(false); return; }
-      try {
-        const endpoint = 'api/profil';
-        await axios.delete(endpoint, { data: { email: email, token: authToken } });
-        fetchProfilsData();
-      } catch (err) {
-        console.error('Erreur lors de la suppression du profil:', err);
-        setError(err.response?.data?.message || 'Impossible de supprimer le profil');
-      } finally {
-        setLoading(false);
-      }
   };
 
 
@@ -763,8 +745,7 @@ export default function Admin() {
                         ) : 'Aucune'}
                         </td>
                         <td className="actions">
-                        <button className="btn-rouge" onClick={() => handleEditProfilClick(profil)}>Modifier</button>
-                        <button className="btn-delete" onClick={() => handleDeleteProfil(profil.email)}>✕</button>
+                          <button className="btn-rouge" onClick={() => handleEditProfilClick(profil)}>Modifier</button>
                         </td>
                     </tr>
                     )) : (<tr><td colSpan="5">Aucun profil trouvé</td></tr>)}
@@ -854,7 +835,6 @@ export default function Admin() {
                   <div className="form-group"><label htmlFor="prenom">Prénom:</label><input type="text" id="prenom" name="prenom" value={newUser.prenom} onChange={handleUserFormChange} required /></div>
                   <div className="form-group"><label htmlFor="email">Email:</label><input type="email" id="email" name="email" value={newUser.email} onChange={handleUserFormChange} required readOnly={isEditMode} /></div>
                   <div className="form-group"><label htmlFor="password">Mot de passe:</label><input type="password" id="password" name="password" value={newUser.password} onChange={handleUserFormChange} placeholder={isEditMode ? 'Laisser vide pour ne pas changer' : ''} required={!isEditMode} /></div>
-                  {}
                   {isEditMode && (
                     <div className="form-group"><label htmlFor="role">Rôle:</label>
                       <select id="role" name="role" value={newUser.role} onChange={handleUserFormChange} required>
@@ -867,7 +847,7 @@ export default function Admin() {
                       <label htmlFor="date">Date d'inscription:</label>
                       <input
                           type="date" id="date" name="date"
-                          value={newUser.date ? new Date(newUser.date).toISOString().split('T')[0] : ''}
+                          value={newUser.date ? newUser.date.split('T')[0] : ''}
                           onChange={handleUserFormChange}
                           required={!isEditMode}
                           readOnly={isEditMode}

@@ -66,9 +66,6 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         return nextGenResultatRepository.findTopByEmailOrderByTimeDesc(email);
     }
 
-    public boolean existsByEmail(String email) {
-        return nextGenResultatRepository.existsByEmail(email);
-    }
     public ResultatQuizz getResultatFromRequest(ResultatRequest resultatRequest){
         ResultatQuizz resultatQuizz = new ResultatQuizz();
         resultatQuizz.setResultatELE(resultatRequest.getResultatELE());
@@ -83,6 +80,7 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         resultatQuizz.setEmail(nextGenUserService.getUserByToken(resultatRequest.getToken()).getEmail());
         return resultatQuizz;
     }
+
     public User getUserFromRequest(ResultatRequest resultatRequest){
         User user = new User();
         user.setToken(resultatRequest.getToken());

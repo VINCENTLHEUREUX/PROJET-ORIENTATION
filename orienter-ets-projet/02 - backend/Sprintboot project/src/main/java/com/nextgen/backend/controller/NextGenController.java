@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Controller for NextGen application endpoints
- */
+//
+// NEXTGEN CONTROLLER
+//
 @RestController
 @RequestMapping("/nextgen")
 public class NextGenController {
@@ -206,9 +206,13 @@ public class NextGenController {
     }
 
     @PostMapping("/program")
-    public ResponseEntity<?> setProgram(@RequestBody ProgramInfo programme){
-        // Il faudra securiser ceci pour permettre l'acces administrateur seulement.
+    public ResponseEntity<?> setProgram(@RequestBody ProgramRequest requete){
         Map<String, Object> response = new HashMap<>();
+        ProgramInfo programme = nextGenProgramsService.getProgramFromRequest(requete);
+    if (!nextGenUserService.isAdmin(requete.getToken())){
+        response.put("message", "Error: invalid user");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
         if (programme.getNom() == null || programme.getNom().isEmpty() ||
                 programme.getSigle() == null || programme.getSigle().isEmpty()){
             response.put("message", "Error: fields cannot be empty");
@@ -226,9 +230,13 @@ public class NextGenController {
     }
 
     @PutMapping("/program")
-    public ResponseEntity<?> updateProgram(@RequestBody ProgramInfo programme){
-        // Il faudra securiser ceci pour permettre l'acces administrateur seulement.
+    public ResponseEntity<?> updateProgram(@RequestBody ProgramRequest requete){
         Map<String, Object> response = new HashMap<>();
+        ProgramInfo programme = nextGenProgramsService.getProgramFromRequest(requete);
+        if (!nextGenUserService.isAdmin(requete.getToken())) {
+            response.put("message", "Error: invalid user");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
         if (programme.getNom() == null || programme.getNom().isEmpty() ||
                 programme.getSigle() == null || programme.getSigle().isEmpty()){
             response.put("message", "Error: fields cannot be empty");

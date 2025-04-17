@@ -5,7 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NextGenProfilRepository extends JpaRepository<Profil, Long> {
     Profil findProfilByEmail(String email);
-
     boolean existsByEmail(String email);
-    boolean deleteByEmail(String email);
 }

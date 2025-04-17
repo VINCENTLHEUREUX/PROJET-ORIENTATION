@@ -1,5 +1,6 @@
 package com.nextgen.backend.service.impl;
 
+import com.nextgen.backend.repository.NextGenProfilRepository;
 import com.nextgen.backend.tables.Profil;
 import com.nextgen.backend.tables.User;
 import com.nextgen.backend.repository.NextGenUserRepository;
@@ -8,7 +9,13 @@ import com.nextgen.backend.service.NextGenUserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -17,13 +24,56 @@ import java.util.regex.Pattern;
 @Service
 public class NextGenUserServiceImpl implements NextGenUserService {
 
+    private final NextGenProfilRepository nextGenProfilRepository;
     NextGenUserRepository nextGenUserRepository;
     NextGenProfilService nextGenProfilService;
+    private static final int SALT_LENGTH = 16;
 
     public NextGenUserServiceImpl(NextGenUserRepository nextGenUserRepository,
-                                  NextGenProfilService nextGenProfilService){
+                                  NextGenProfilService nextGenProfilService, NextGenProfilRepository nextGenProfilRepository){
         this.nextGenUserRepository = nextGenUserRepository;
         this.nextGenProfilService = nextGenProfilService;
+        this.nextGenProfilRepository = nextGenProfilRepository;
+    }
+
+    private String encryptPassword(String rawPassword) {
+        try {
+            SecureRandom random = new SecureRandom();
+            byte[] salt = new byte[SALT_LENGTH];
+            random.nextBytes(salt);
+
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(salt);
+            byte[] hash = md.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
+
+            byte[] combined = new byte[salt.length + hash.length];
+            System.arraycopy(salt, 0, combined, 0, salt.length);
+            System.arraycopy(hash, 0, combined, salt.length, hash.length);
+
+            return Base64.getEncoder().encodeToString(combined);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error encrypting password", e);
+        }
+    }
+// Consiste a verifier si le mot de passe, lorsquil est encrypte, est identique
+    private boolean verifyPassword(String rawPassword, String encodedPassword) {
+        try {
+            byte[] combined = Base64.getDecoder().decode(encodedPassword);
+
+            byte[] salt = new byte[SALT_LENGTH];
+            System.arraycopy(combined, 0, salt, 0, SALT_LENGTH);
+
+            byte[] storedHash = new byte[combined.length - SALT_LENGTH];
+            System.arraycopy(combined, SALT_LENGTH, storedHash, 0, storedHash.length);
+
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(salt);
+            byte[] newHash = md.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
+
+            return Arrays.equals(storedHash, newHash);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -38,6 +88,9 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         if (!strongPassword(user.getPassword())){
             return false;
         }
+        String encryptedPassword = encryptPassword(user.getPassword());
+        user.setPassword(encryptedPassword);
+
         Profil profil = new Profil();
         profil.setEmail(user.getEmail());
         user.setDate(LocalDate.now());
@@ -61,7 +114,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
             user.setPassword(userSave.getPassword());
         }
         else{
-
+            user.setPassword(encryptPassword(user.getPassword()));
         }
         if (existsByEmail(user.getEmail())){
             user.setUserId(userSave.getUserId());
@@ -74,6 +127,7 @@ public class NextGenUserServiceImpl implements NextGenUserService {
     @Override
     @Transactional
     public boolean deleteUser(User user) {
+        Profil profil = nextGenProfilService.getProfilByEmail(user.getEmail());
         if (!isAdmin(user.getToken())){
             return false;
         }
@@ -85,20 +139,13 @@ public class NextGenUserServiceImpl implements NextGenUserService {
         if (oldUser == null) {
             return false;
         }
-            nextGenUserRepository.delete(oldUser);
-            return true;
-        }
-
-    @Override
-    public User getUserById(long userId) {
-        //Insérer la logique supplémentaire ici
-
-        return nextGenUserRepository.findById(userId).get();
+        nextGenUserRepository.delete(oldUser);
+        nextGenProfilRepository.delete(profil);
+        return true;
     }
+
     @Override
     public User getUserByEmail(String email) {
-        //Insérer la logique supplémentaire ici
-
         return nextGenUserRepository.getUserByEmail(email);
     }
 
@@ -106,8 +153,6 @@ public class NextGenUserServiceImpl implements NextGenUserService {
     public boolean existsByEmail(String email) {
         return nextGenUserRepository.existsByEmail(email);
     }
-
-
 
     public boolean isValidEmail(String email) {
         if (email == null || email.isEmpty()) {
@@ -140,12 +185,13 @@ public class NextGenUserServiceImpl implements NextGenUserService {
             return false;
         }
         User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
-        if (existsByEmail(user.getEmail()) && user.getPassword().equals(userSave.getPassword())){
+        if (existsByEmail(user.getEmail()) && verifyPassword(user.getPassword(), userSave.getPassword())){
             generateToken(userSave.getEmail());
             return true;
         }
         return false;
     }
+
     public boolean loginUserToken(User user) {
         if (user == null ||  user.getToken() == null) {
             return false;
