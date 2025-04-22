@@ -52,12 +52,12 @@ export default function Admin() {
     else if (table === 'User') fetchUsersData();
   };
 
-  // Récupère les données des programmes depuis l'API
+  // Récupère les données des programmes depuis l'https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen
   const fetchProgramsData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('api/programs');
+      const response = await axios.get('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/programs');
       setProgramsData(response.data?.programs || []);
     } catch (err) {
       console.error('Erreur lors de la récupération des programmes:', err);
@@ -72,7 +72,7 @@ export default function Admin() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('api/questions');
+      const response = await axios.get('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/questions');
       setQuestionsData(response.data?.questions || []);
     } catch (err) {
       console.error('Erreur lors de la récupération des questions:', err);
@@ -93,7 +93,7 @@ export default function Admin() {
       return;
     }
     try {
-      const response = await axios.post('api/profils', { token: authToken });
+      const response = await axios.post('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/profils', { token: authToken });
       setProfilsData(response.data?.profils || []);
     } catch (err) {
       console.error('Erreur lors de la récupération des profils:', err);
@@ -114,7 +114,7 @@ export default function Admin() {
       return;
     }
     try {
-      const response = await axios.post('api/allresults', { token: authToken });
+      const response = await axios.post('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/allresults', { token: authToken });
       setResultsData(response.data?.results || []);
     } catch (err) {
       console.error('Erreur lors de la récupération des résultats:', err);
@@ -135,7 +135,7 @@ export default function Admin() {
       return;
     }
     try {
-      const response = await axios.post('api/users', { token: authToken });
+      const response = await axios.post('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/users', { token: authToken });
       setUsersData(response.data?.users || []);
     } catch (err) {
       console.error('Erreur lors de la récupération des utilisateurs:', err);
@@ -215,7 +215,7 @@ export default function Admin() {
         token: authToken,
         credits: newProgram.credits ? parseInt(newProgram.credits, 10) : null
       };
-      const endpoint = 'api/program';
+      const endpoint = 'https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/program';
       if (isEditMode) {
         await axios.put(endpoint, formattedProgram);
       } else {
@@ -240,7 +240,7 @@ export default function Admin() {
       const authToken = localStorage.getItem('authToken');
       if (!authToken) { setError('Authentification requise'); setLoading(false); return; }
       try {
-        await axios.delete('api/program', { data: { sigle: sigle, token: authToken } });
+        await axios.delete('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/program', { data: { sigle: sigle, token: authToken } });
         fetchProgramsData();
       } catch (err) {
         console.error('Erreur lors de la suppression du programme:', err);
@@ -299,7 +299,7 @@ export default function Admin() {
         question: newQuestion.description,
         token: authToken
       };
-      const endpoint = 'api/question';
+      const endpoint = 'https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/question';
       let response;
       if (isEditMode) {
         response = await axios.put(endpoint, formattedQuestion);
@@ -330,7 +330,7 @@ export default function Admin() {
       const authToken = localStorage.getItem('authToken');
       if (!authToken) { setError('Authentification requise'); setLoading(false); return; }
       try {
-        const response = await axios.delete('api/question', { data: { id: id, token: authToken } });
+        const response = await axios.delete('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/question', { data: { id: id, token: authToken } });
         if (response.status === 200) {
           fetchQuestionsData();
         } else {
@@ -396,7 +396,7 @@ export default function Admin() {
 
     try {
       const formattedResult = { ...newResult, token: authToken };
-      const endpoint = 'api/result';
+      const endpoint = 'https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/result';
       if (isEditMode) {
         await axios.put(endpoint, formattedResult);
       } else {
@@ -422,7 +422,7 @@ export default function Admin() {
       const authToken = localStorage.getItem('authToken');
       if (!authToken) { setError('Authentification requise'); setLoading(false); return; }
       try {
-        await axios.delete('api/result', { data: { resultId: resultId, token: authToken } });
+        await axios.delete('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/result', { data: { resultId: resultId, token: authToken } });
         fetchResultsData();
       } catch (err) {
         console.error('Erreur lors de la suppression du résultat:', err);
@@ -503,7 +503,7 @@ export default function Admin() {
             userData.date = newUser.date || new Date().toISOString().split('T')[0];
         }
 
-        const endpoint = 'api/user';
+        const endpoint = 'https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/user';
         if (isEditMode) {
             await axios.put(endpoint, userData);
         } else {
@@ -536,7 +536,7 @@ export default function Admin() {
     if (!authToken) { setError('Authentification requise'); setLoading(false); return; }
 
     try {
-        const endpoint = 'api/user';
+        const endpoint = 'https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/user';
         await axios.delete(endpoint, { data: { email: userToDelete.email, token: authToken } });
         fetchUsersData();
     } catch (err) {
@@ -591,7 +591,7 @@ export default function Admin() {
         etudes: newProfil.etudes,
         pictureUrl: newProfil.pictureUrl
       };
-      const endpoint = 'api/profil';
+      const endpoint = 'https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/profil';
       await axios.put(endpoint, profilDataToUpdate);
 
       setShowProfilForm(false);

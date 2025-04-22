@@ -26,7 +26,7 @@ export default function FormulaireOrientation() {
 const fetchQuestions = async () => {
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8080/nextgen/questions')
+      const response = await fetch('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/questions')
       if (!response.ok) {
         throw new Error(`Error ${response.status}`)
       }
@@ -114,7 +114,7 @@ const envoyer = async () => {
     setResultats(resultats)
     
     try {
-      const response = await fetch('http://localhost:8080/nextgen/result', {
+      const response = await fetch('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/result', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

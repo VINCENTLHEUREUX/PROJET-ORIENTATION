@@ -33,10 +33,6 @@ export default function Profile() {
   const fetchUserData = async () => {
     try {
       const authToken = localStorage.getItem('authToken')
-      const headers = {
-        'Authorization': `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      }
   
       const storedUser = localStorage.getItem('user')
       if (storedUser) {
@@ -46,14 +42,14 @@ export default function Profile() {
         if (userData.prenom) setPrenom(userData.prenom)
       }
   
-      const profileResponse = await axios.post('/api/profil', {
+      const profileResponse = await axios.post('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/profil', {
         token: authToken
-      }, { headers })
+      }, { headers: {} })
   
       if (profileResponse.data) {
         const profileData = profileResponse.data
         
-        if (profileData.picture_url && profileData.picture_url !== 'calisse') {
+        if (profileData.picture_url) {
           setProfilePicUrl(profileData.picture_url)
         }
         
@@ -75,9 +71,9 @@ export default function Profile() {
         }
       }
   
-      const orientationResponse = await axios.post('/api/results', {
+      const orientationResponse = await axios.post('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/results', {
         token: authToken
-      }, { headers })
+      }, { headers: {} })
       
       setOrientationResults(orientationResponse.data)
     } catch (err) {
@@ -110,12 +106,12 @@ export default function Profile() {
   const saveAllChanges = async () => {
     try {
       const authToken = localStorage.getItem('authToken')
-      const response = await axios.put('/api/profil', {
+      const response = await axios.put('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/profil', {
         token: authToken,
         pictureUrl: profilePicUrl,
         biographie,
         etudes
-      }, { headers })
+      }, { headers: {} })
 
       if (response.data) {
         const userData = userInfo ? {...userInfo} : {}

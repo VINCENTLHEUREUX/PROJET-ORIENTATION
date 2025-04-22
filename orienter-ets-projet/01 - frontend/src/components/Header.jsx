@@ -53,7 +53,7 @@ const Header = () => {
         'Content-Type': 'application/json'
       };
       
-      const response = await axios.post('api/profil', {
+      const response = await axios.post('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/profil', {
         token: token
       }, { headers });
       

@@ -60,7 +60,7 @@ const Inscription = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/nextgen/user", {
+      const response = await fetch("https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/user", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

@@ -52,7 +52,7 @@ export default function Connexion() {
     }
 
     try {
-      const response = await fetch('/api/user/login', {
+      const response = await fetch('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

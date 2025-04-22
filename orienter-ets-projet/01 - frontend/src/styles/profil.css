@@ -7,6 +7,8 @@
   .profile-page {
     min-height: 100vh;
     background-color: rgb(249 250 251);
+    display: flex;
+    flex-direction: column;
   }
 
   .profile-main {
@@ -18,6 +20,7 @@
     padding-right: 1rem;
     padding-top: 2rem;
     padding-bottom: 2rem;
+    flex-grow: 1;
   }
 
   .profile-container {
@@ -121,7 +124,7 @@
     align-items: center;
     margin-bottom: 30px;
   }
-  
+
   .profile-pic-circle {
     width: 150px;
     height: 150px;
@@ -131,13 +134,13 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin-bottom: 15px;
   }
-  
+
   .profile-pic {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   .edit-pic-btn {
     padding: 8px 16px;
     background-color: rgb(185, 28, 28);
@@ -150,17 +153,17 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: background-color 0.3s;
   }
-  
+
   .edit-pic-btn:hover {
     background-color: rgb(153, 27, 27);
   }
-  
+
   .profile-pic-edit {
     width: 100%;
     max-width: 300px;
     margin-top: 15px;
   }
-  
+
   .profile-pic-input {
     width: 100%;
     padding: 10px 12px;
@@ -171,19 +174,19 @@
     background-color: #f8f9fa;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   }
-  
+
   .profile-pic-input:focus {
     outline: none;
     border-color: rgb(153, 27, 27);
     box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.25);
   }
-  
+
   .profile-pic-buttons {
     display: flex;
     justify-content: center;
     gap: 12px;
   }
-  
+
   .cancel-pic-btn {
     padding: 8px 16px;
     border-radius: 20px;
@@ -196,12 +199,12 @@
     color: white;
     border: none;
   }
-  
+
   .cancel-pic-btn:hover {
     background-color: rgb(153, 27, 27);
     transform: translateY(-2px);
   }
-  
+
   .bio-section, .etudes-section {
     margin-top: 20px;
     border: 1px solid #e0e0e0;
@@ -209,20 +212,20 @@
     padding: 15px;
     background-color: #f9f9f9;
   }
-  
+
   .bio-header, .etudes-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
   }
-  
+
   .bio-title, .etudes-title {
     font-size: 18px;
     margin: 0;
     color: #333;
   }
-  
+
   .edit-btn {
     padding: 6px 12px;
     background-color: rgb(185, 28, 28);
@@ -233,18 +236,18 @@
     font-size: 12px;
     font-weight: bold;
   }
-  
+
   .edit-btn:hover {
     background-color: rgb(153, 27, 27);
   }
-  
+
   .bio-text, .etudes-text {
     margin: 0;
     color: #555;
     line-height: 1.5;
     white-space: pre-wrap;
   }
-  
+
   .bio-textarea, .etudes-textarea {
     width: 100%;
     min-height: 100px;
@@ -256,7 +259,7 @@
     font-size: 14px;
     resize: vertical;
   }
-  
+
   .confirm-btn {
     padding: 8px 16px;
     background-color: rgb(185, 28, 28);
@@ -266,16 +269,16 @@
     cursor: pointer;
     font-weight: bold;
   }
-  
+
   .confirm-btn:hover {
     background-color: rgb(153, 27, 27);
   }
-  
+
   .save-changes-container {
     margin-top: 25px;
     text-align: center;
   }
-  
+
   .save-all-changes-btn {
     padding: 12px 24px;
     background-color: rgb(185, 28, 28);
@@ -288,7 +291,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
   }
-  
+
   .save-all-changes-btn:hover {
     background-color: rgb(153, 27, 27);
     transform: translateY(-2px);
@@ -296,12 +299,8 @@
   }
 }
 
-/* Responsive Design */
 @media (max-width: 640px) {
   .info-row {
     grid-template-columns: 1fr;
   }
 }
-
-
-
