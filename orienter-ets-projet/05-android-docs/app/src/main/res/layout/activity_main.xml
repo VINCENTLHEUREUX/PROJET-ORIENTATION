@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/white">
+
+    <!-- Titre -->
+    <TextView
+        android:id="@+id/accueilTitre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bienvenue sur Orientation ÉTS"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#D32F2F"
+        android:layout_marginBottom="40dp" />
+
+    <!-- Bouton Commencer le quiz -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCommencerQuiz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Commencer le quiz"
+        style="@style/RedButtonStyle"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Bouton Voir mes résultats -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnVoirResultats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Voir mes résultats"
+        style="@style/RedButtonStyle" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDeconnexion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Se déconnecter"
+        style="@style/RedButtonStyle"
+        android:layout_marginTop="32dp" />
+
+
+</LinearLayout>
