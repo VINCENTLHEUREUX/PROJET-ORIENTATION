@@ -169,11 +169,6 @@ export default function Connexion() {
                 S'inscrire
               </Link>
             </p>
-            <p className="lien-motdepasse-oublie">
-              <Link to="/mot-de-passe-oublie" className="texte-lien">
-                Mot de passe oublié ?
-              </Link>
-            </p>
           </div>
         </div>
       </main>
