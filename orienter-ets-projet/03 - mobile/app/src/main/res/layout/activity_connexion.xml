@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/white">
+
+    <!-- Titre -->
+    <TextView
+        android:id="@+id/loginTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connexion à Orientation ÉTS"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#D32F2F"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Champ Email -->
+    <EditText
+        android:id="@+id/inputEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Adresse courriel"
+        android:inputType="textEmailAddress"
+        android:minHeight="48dp"
+        android:background="@drawable/edittext_arrondi"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#888888" />
+
+    <!-- Champ Mot de passe -->
+    <EditText
+        android:id="@+id/inputPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Mot de passe"
+        android:inputType="textPassword"
+        android:minHeight="48dp"
+        android:background="@drawable/edittext_arrondi"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#888888" />
+
+    <!-- Bouton Connexion -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnConnexion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Connexion"
+        style="@style/RedButtonStyle" />
+
+    <!-- Bouton Inscription -->
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnVersInscription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Créer un compte"
+        style="@style/RedButtonStyle" />
+</LinearLayout>

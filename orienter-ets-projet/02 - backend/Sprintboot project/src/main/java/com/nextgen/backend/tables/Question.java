@@ -15,31 +15,23 @@ public class Question {
         this.description = description;
         this.sigle = sigle;
     }
-
     public Question() {
-
     }
-
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
-
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getSigle() {
         return sigle;
     }
-
     public void setSigle(String sigle) {
         this.sigle = sigle;
     }

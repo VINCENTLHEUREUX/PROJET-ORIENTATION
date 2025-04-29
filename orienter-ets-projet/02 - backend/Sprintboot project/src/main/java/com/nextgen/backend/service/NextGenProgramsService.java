@@ -1,7 +1,7 @@
 package com.nextgen.backend.service;
 
 import com.nextgen.backend.tables.ProgramInfo;
-import com.nextgen.backend.tables.requests.ProgramRequest;
+import com.nextgen.backend.requests.ProgramRequest;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package com.nextgen.backend.service.impl;
 import com.nextgen.backend.tables.ProgramInfo;
 import com.nextgen.backend.repository.NextGenProgramsRepository;
 import com.nextgen.backend.service.NextGenProgramsService;
-import com.nextgen.backend.tables.requests.ProgramRequest;
+import com.nextgen.backend.requests.ProgramRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class NextGenProgramsServiceImpl implements NextGenProgramsService {
         }
         return false;
     }
-    // Crée un programme et s'assure de la validité. Retourne boolean pour sa validité.
+
     public boolean createProgram(ProgramInfo program){
         if (existsBySigle(program.getSigle())){
             return false;

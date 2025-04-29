@@ -1,7 +1,7 @@
 package com.nextgen.backend.service;
 
 import com.nextgen.backend.tables.ResultatQuizz;
-import com.nextgen.backend.tables.requests.ResultatRequest;
+import com.nextgen.backend.requests.ResultatRequest;
 import com.nextgen.backend.tables.User;
 
 import java.util.List;

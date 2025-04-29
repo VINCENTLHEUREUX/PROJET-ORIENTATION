@@ -1,7 +1,7 @@
 package com.nextgen.backend.service.impl;
 
 
-import com.nextgen.backend.tables.requests.ResultatRequest;
+import com.nextgen.backend.requests.ResultatRequest;
 import com.nextgen.backend.tables.ResultatQuizz;
 import com.nextgen.backend.tables.User;
 import com.nextgen.backend.service.NextGenResultatService;
@@ -11,6 +11,7 @@ import com.nextgen.backend.repository.NextGenResultatRepository;
 
 import java.util.Collections;
 import java.util.List;
+// Gestion des opérations a la table resultats de la DB
 
 @Service
 public class NextGenResultatServiceImpl implements NextGenResultatService {
@@ -29,7 +30,6 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         }
         return null;
     }
-
 
     public boolean createResult(ResultatQuizz result) {
             ResultatQuizz saved = nextGenResultatRepository.save(result);
@@ -93,5 +93,4 @@ public class NextGenResultatServiceImpl implements NextGenResultatService {
         }
         return Collections.emptyList();
     }
-
 }

@@ -24,7 +24,6 @@ public class ResultatQuizz {
     private int resultatGTI;
     private LocalDateTime time = LocalDateTime.now();
     @Transient
-    @Autowired
     NextGenUserRepository nextGenUserRepository;
 
     /******************************** CONSTRUCTEUR AVEC PARAM **************************************/
@@ -49,13 +48,6 @@ public class ResultatQuizz {
 
     ;
 
-    public LocalDateTime getTime() {
-        return time;
-    }
-
-    public void setTime(LocalDateTime time) {
-        this.time = time;
-    }
 
     public long getResultId() {
         return resultId;
@@ -137,13 +129,6 @@ public class ResultatQuizz {
         this.resultatGTI = resultatGTI;
     }
 
-    public NextGenUserRepository getNextGenUserRepository() {
-        return nextGenUserRepository;
-    }
-
-    public void setNextGenUserRepository(NextGenUserRepository nextGenUserRepository) {
-        this.nextGenUserRepository = nextGenUserRepository;
-    }
 }
 
 /********************************* SETTERS *****************************/

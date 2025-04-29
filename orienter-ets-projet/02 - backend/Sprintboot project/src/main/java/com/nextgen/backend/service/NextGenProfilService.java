@@ -1,7 +1,7 @@
 package com.nextgen.backend.service;
 
 import com.nextgen.backend.tables.Profil;
-import com.nextgen.backend.tables.requests.ProfilRequest;
+import com.nextgen.backend.requests.ProfilRequest;
 import com.nextgen.backend.tables.User;
 
 import java.util.List;

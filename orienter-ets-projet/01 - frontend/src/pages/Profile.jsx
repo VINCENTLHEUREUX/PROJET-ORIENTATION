@@ -110,7 +110,8 @@ export default function Profile() {
         token: authToken,
         pictureUrl: profilePicUrl,
         biographie,
-        etudes
+        etudes,
+        email: userInfo?.email || ''
       }, { headers: {} })
 
       if (response.data) {

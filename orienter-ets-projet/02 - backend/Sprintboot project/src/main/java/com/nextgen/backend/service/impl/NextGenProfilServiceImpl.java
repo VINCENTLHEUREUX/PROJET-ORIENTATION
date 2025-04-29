@@ -1,7 +1,7 @@
 package com.nextgen.backend.service.impl;
 
 import com.nextgen.backend.tables.Profil;
-import com.nextgen.backend.tables.requests.ProfilRequest;
+import com.nextgen.backend.requests.ProfilRequest;
 import com.nextgen.backend.tables.User;
 import com.nextgen.backend.repository.NextGenProfilRepository;
 import com.nextgen.backend.repository.NextGenUserRepository;
@@ -73,6 +73,7 @@ public class NextGenProfilServiceImpl implements NextGenProfilService {
         }
         return Collections.emptyList();
     }
+
     public Profil getProfilByEmail(String email){
         return nextGenProfilRepository.findProfilByEmail(email);
     }

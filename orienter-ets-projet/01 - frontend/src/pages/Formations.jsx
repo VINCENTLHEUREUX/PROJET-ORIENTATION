@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import axios from 'axios';
 import '../styles/formations.css';
 
+// Composant principal qui affiche les formations disponibles
 export default function Formations() {
   const [formations, setFormations] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +21,7 @@ export default function Formations() {
 
   const fromOrientation = location.state?.fromOrientation || false;
 
+  // Récupère les données des formations et résultats du test
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -29,6 +31,7 @@ export default function Formations() {
         const formationsResponse = await axios.get('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/programs');
 
         if (formationsResponse.data && formationsResponse.data.programs) {
+          // Transforme les données brutes en format utilisable
           const programsWithMappedFields = formationsResponse.data.programs.map(program => ({
             id: program.sigle,
             titre: program.nom,
@@ -85,6 +88,7 @@ export default function Formations() {
     fetchData();
   }, [fromOrientation]);
 
+  // Calcule le pourcentage de compatibilité pour une formation
   const getCompatibilityPercentage = (formationId) => {
     if (!orientationResults || !formationId) return 0;
     const key = `resultat${formationId.toLowerCase()}`;
@@ -93,6 +97,7 @@ export default function Formations() {
     return Math.round(((clampedScore - 5) / 20) * 100);
   };
 
+  // Détermine la classe CSS selon le niveau de compatibilité
   const getCompatibilityClass = (formationId) => {
     if (!orientationResults || !showResults || !formationId) return '';
     const key = `resultat${formationId.toLowerCase()}`;
@@ -102,6 +107,7 @@ export default function Formations() {
     return 'compatibility-low';
   };
 
+  // Filtre les formations selon la recherche et critères
   const filteredFormations = useMemo(() => {
     if (!Array.isArray(formations)) return [];
 
@@ -109,11 +115,12 @@ export default function Formations() {
       const titleMatch = formation.titre?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
       const descriptionMatch = formation.description?.toLowerCase().includes(searchTerm.toLowerCase()) || false;
       const matchesSearch = titleMatch || descriptionMatch;
-      const matchesFilter = filter === 'tous' || formation.id === filter; // Assuming filter uses id
+      const matchesFilter = filter === 'tous' || formation.id === filter;
       return matchesSearch && matchesFilter;
     });
   }, [formations, searchTerm, filter]);
 
+  // Trie les formations selon les critères choisis
   const sortedFormations = useMemo(() => {
     if (!filteredFormations.length) return [];
 
@@ -153,10 +160,12 @@ export default function Formations() {
     });
   }, [filteredFormations, sortBy, sortOrder, orientationResults]);
 
+  // Change le critère de tri des formations
   const handleSortChange = (newSortBy) => {
     setSortBy(newSortBy);
   };
 
+  // Réinitialise tous les filtres et options de tri
   const resetSort = () => {
     const defaultSort = orientationResults ? 'compatibility' : 'nom';
     const defaultOrder = orientationResults ? 'desc' : 'asc';
@@ -167,6 +176,7 @@ export default function Formations() {
     setShowResults(false);
   };
 
+  // Affiche ou masque les résultats de compatibilité
   const toggleShowResults = () => {
     if (showResults) {
       resetSort();

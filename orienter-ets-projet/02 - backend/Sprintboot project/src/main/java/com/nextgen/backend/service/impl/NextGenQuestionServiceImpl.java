@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+// Gestion des opérations a la table Question de la DB
 
 @Service
 public class NextGenQuestionServiceImpl implements NextGenQuestionService {
@@ -37,6 +38,7 @@ public class NextGenQuestionServiceImpl implements NextGenQuestionService {
         }
         return false;
     }
+
     public boolean updateById(Long id, String question, String sigle, String token) {
         if (nextGenUserService.isAdmin(token) && nextGenQuestionRepository.existsById(id)){
             Question objetQuestion =
@@ -48,6 +50,7 @@ public class NextGenQuestionServiceImpl implements NextGenQuestionService {
         }
         return false;
     }
+
     public boolean saveQuestion(String question, String sigle, String token) {
         if (nextGenUserService.isAdmin(token) && !nextGenQuestionRepository.existsByDescription(question)){
             Question objetQuestion = new Question();
