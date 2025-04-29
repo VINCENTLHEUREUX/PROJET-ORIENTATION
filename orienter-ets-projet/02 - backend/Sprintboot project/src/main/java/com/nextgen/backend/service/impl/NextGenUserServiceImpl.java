@@ -1,232 +1,232 @@
-package com.nextgen.backend.service.impl;
+    package com.nextgen.backend.service.impl;
 
-import com.nextgen.backend.repository.NextGenProfilRepository;
-import com.nextgen.backend.tables.Profil;
-import com.nextgen.backend.tables.User;
-import com.nextgen.backend.repository.NextGenUserRepository;
-import com.nextgen.backend.service.NextGenProfilService;
-import com.nextgen.backend.service.NextGenUserService;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
+    import com.nextgen.backend.repository.NextGenProfilRepository;
+    import com.nextgen.backend.tables.Profil;
+    import com.nextgen.backend.tables.User;
+    import com.nextgen.backend.repository.NextGenUserRepository;
+    import com.nextgen.backend.service.NextGenProfilService;
+    import com.nextgen.backend.service.NextGenUserService;
+    import jakarta.transaction.Transactional;
+    import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Pattern;
+    import java.nio.charset.StandardCharsets;
+    import java.security.MessageDigest;
+    import java.security.NoSuchAlgorithmException;
+    import java.security.SecureRandom;
+    import java.time.LocalDate;
+    import java.util.Arrays;
+    import java.util.Base64;
+    import java.util.Collections;
+    import java.util.List;
+    import java.util.UUID;
+    import java.util.regex.Pattern;
+// Gestion des opérations a la table users de la DB
+    @Service
+    public class NextGenUserServiceImpl implements NextGenUserService {
 
-@Service
-public class NextGenUserServiceImpl implements NextGenUserService {
+        private final NextGenProfilRepository nextGenProfilRepository;
+        NextGenUserRepository nextGenUserRepository;
+        NextGenProfilService nextGenProfilService;
+        private static final int SALT_LENGTH = 16;
 
-    private final NextGenProfilRepository nextGenProfilRepository;
-    NextGenUserRepository nextGenUserRepository;
-    NextGenProfilService nextGenProfilService;
-    private static final int SALT_LENGTH = 16;
-
-    public NextGenUserServiceImpl(NextGenUserRepository nextGenUserRepository,
-                                  NextGenProfilService nextGenProfilService, NextGenProfilRepository nextGenProfilRepository){
-        this.nextGenUserRepository = nextGenUserRepository;
-        this.nextGenProfilService = nextGenProfilService;
-        this.nextGenProfilRepository = nextGenProfilRepository;
-    }
-
-    private String encryptPassword(String rawPassword) {
-        try {
-            SecureRandom random = new SecureRandom();
-            byte[] salt = new byte[SALT_LENGTH];
-            random.nextBytes(salt);
-
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(salt);
-            byte[] hash = md.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
-
-            byte[] combined = new byte[salt.length + hash.length];
-            System.arraycopy(salt, 0, combined, 0, salt.length);
-            System.arraycopy(hash, 0, combined, salt.length, hash.length);
-
-            return Base64.getEncoder().encodeToString(combined);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error encrypting password", e);
-        }
-    }
-// Consiste a verifier si le mot de passe, lorsquil est encrypte, est identique
-    private boolean verifyPassword(String rawPassword, String encodedPassword) {
-        try {
-            byte[] combined = Base64.getDecoder().decode(encodedPassword);
-
-            byte[] salt = new byte[SALT_LENGTH];
-            System.arraycopy(combined, 0, salt, 0, SALT_LENGTH);
-
-            byte[] storedHash = new byte[combined.length - SALT_LENGTH];
-            System.arraycopy(combined, SALT_LENGTH, storedHash, 0, storedHash.length);
-
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(salt);
-            byte[] newHash = md.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
-
-            return Arrays.equals(storedHash, newHash);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean createUser(User user) {
-        String token = UUID.randomUUID().toString();
-        if (existsByEmail(user.getEmail())){
-            return false;
-        }
-        if (!isValidEmail(user.getEmail())){
-            return false;
-        }
-        if (!strongPassword(user.getPassword())){
-            return false;
-        }
-        String encryptedPassword = encryptPassword(user.getPassword());
-        user.setPassword(encryptedPassword);
-
-        Profil profil = new Profil();
-        profil.setEmail(user.getEmail());
-        user.setDate(LocalDate.now());
-        user.setRole("Utilisateur"); // Puisque cette méthode sert au utilisateurs
-        user.setToken(token);
-        if (nextGenProfilService.saveProfil(profil)){
-            nextGenUserRepository.save(user);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean updateUser(User user) {
-        User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
-        if (!isAdmin(user.getToken())){ // Seulement les admins peuvent udpate
-            return false;
-        }
-        user.setToken(userSave.getToken()); // Important ici de garder le token
-        if (user.getPassword() == null){
-            user.setPassword(userSave.getPassword());
-        }
-        else{
-            user.setPassword(encryptPassword(user.getPassword()));
-        }
-        if (existsByEmail(user.getEmail())){
-            user.setUserId(userSave.getUserId());
-            nextGenUserRepository.save(user);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    @Transactional
-    public boolean deleteUser(User user) {
-        Profil profil = nextGenProfilService.getProfilByEmail(user.getEmail());
-        if (!isAdmin(user.getToken())){
-            return false;
-        }
-        if (user == null || user.getEmail() == null) {
-            return false;
-        }
-        User oldUser = getUserByEmail(user.getEmail());
-
-        if (oldUser == null) {
-            return false;
-        }
-        nextGenUserRepository.delete(oldUser);
-        nextGenProfilRepository.delete(profil);
-        return true;
-    }
-
-    @Override
-    public User getUserByEmail(String email) {
-        return nextGenUserRepository.getUserByEmail(email);
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return nextGenUserRepository.existsByEmail(email);
-    }
-
-    public boolean isValidEmail(String email) {
-        if (email == null || email.isEmpty()) {
-            return false;
+        public NextGenUserServiceImpl(NextGenUserRepository nextGenUserRepository,
+                                      NextGenProfilService nextGenProfilService, NextGenProfilRepository nextGenProfilRepository){
+            this.nextGenUserRepository = nextGenUserRepository;
+            this.nextGenProfilService = nextGenProfilService;
+            this.nextGenProfilRepository = nextGenProfilRepository;
         }
 
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        return pattern.matcher(email).matches();
-    }
+        private String encryptPassword(String rawPassword) {
+            try {
+                SecureRandom random = new SecureRandom();
+                byte[] salt = new byte[SALT_LENGTH];
+                random.nextBytes(salt);
 
-    public boolean strongPassword(String password){
-        int numberCount = 0;
-        for (char c : password.toCharArray()){
-            if (Character.isDigit(c)){
-                numberCount = numberCount + 1;
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                md.update(salt);
+                byte[] hash = md.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
+
+                byte[] combined = new byte[salt.length + hash.length];
+                System.arraycopy(salt, 0, combined, 0, salt.length);
+                System.arraycopy(hash, 0, combined, salt.length, hash.length);
+
+                return Base64.getEncoder().encodeToString(combined);
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException("Error encrypting password", e);
             }
         }
-        if (password.length() >= 12 && numberCount >= 2){
-            return true;
-        }
-        return false;
-    }
+    // Consiste a verifier si le mot de passe, lorsquil est encrypte, est identique
+        private boolean verifyPassword(String rawPassword, String encodedPassword) {
+            try {
+                byte[] combined = Base64.getDecoder().decode(encodedPassword);
 
-    public boolean loginUserEmail(User user) {
-        if (user == null ||  user.getEmail() == null || user.getPassword() == null) {
+                byte[] salt = new byte[SALT_LENGTH];
+                System.arraycopy(combined, 0, salt, 0, SALT_LENGTH);
+
+                byte[] storedHash = new byte[combined.length - SALT_LENGTH];
+                System.arraycopy(combined, SALT_LENGTH, storedHash, 0, storedHash.length);
+
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                md.update(salt);
+                byte[] newHash = md.digest(rawPassword.getBytes(StandardCharsets.UTF_8));
+
+                return Arrays.equals(storedHash, newHash);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean createUser(User user) {
+            String token = UUID.randomUUID().toString();
+            if (existsByEmail(user.getEmail())){
+                return false;
+            }
+            if (!isValidEmail(user.getEmail())){
+                return false;
+            }
+            if (!strongPassword(user.getPassword())){
+                return false;
+            }
+            String encryptedPassword = encryptPassword(user.getPassword());
+            user.setPassword(encryptedPassword);
+
+            Profil profil = new Profil();
+            profil.setEmail(user.getEmail());
+            user.setDate(LocalDate.now());
+            user.setRole("Utilisateur"); // Puisque cette méthode sert au utilisateurs
+            user.setToken(token);
+            if (nextGenProfilService.saveProfil(profil)){
+                nextGenUserRepository.save(user);
+                return true;
+            }
             return false;
         }
-        if (!isValidEmail(user.getEmail())){
+
+        @Override
+        public boolean updateUser(User user) {
+            User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
+            if (!isAdmin(user.getToken())){ // Seulement les admins peuvent udpate
+                return false;
+            }
+            user.setToken(userSave.getToken()); // Important ici de garder le token
+            if (user.getPassword() == null){
+                user.setPassword(userSave.getPassword());
+            }
+            else{
+                user.setPassword(encryptPassword(user.getPassword()));
+            }
+            if (existsByEmail(user.getEmail())){
+                user.setUserId(userSave.getUserId());
+                nextGenUserRepository.save(user);
+                return true;
+            }
             return false;
         }
-        User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
-        if (existsByEmail(user.getEmail()) && verifyPassword(user.getPassword(), userSave.getPassword())){
-            generateToken(userSave.getEmail());
+
+        @Override
+        @Transactional
+        public boolean deleteUser(User user) {
+            Profil profil = nextGenProfilService.getProfilByEmail(user.getEmail());
+            if (!isAdmin(user.getToken())){
+                return false;
+            }
+            if (user == null || user.getEmail() == null) {
+                return false;
+            }
+            User oldUser = getUserByEmail(user.getEmail());
+
+            if (oldUser == null) {
+                return false;
+            }
+            nextGenUserRepository.delete(oldUser);
+            nextGenProfilRepository.delete(profil);
             return true;
         }
-        return false;
-    }
 
-    public boolean loginUserToken(User user) {
-        if (user == null ||  user.getToken() == null) {
+        @Override
+        public User getUserByEmail(String email) {
+            return nextGenUserRepository.getUserByEmail(email);
+        }
+
+        @Override
+        public boolean existsByEmail(String email) {
+            return nextGenUserRepository.existsByEmail(email);
+        }
+
+        public boolean isValidEmail(String email) {
+            if (email == null || email.isEmpty()) {
+                return false;
+            }
+
+            String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+            Pattern pattern = Pattern.compile(emailRegex);
+            return pattern.matcher(email).matches();
+        }
+
+        public boolean strongPassword(String password){
+            int numberCount = 0;
+            for (char c : password.toCharArray()){
+                if (Character.isDigit(c)){
+                    numberCount = numberCount + 1;
+                }
+            }
+            if (password.length() >= 12 && numberCount >= 2){
+                return true;
+            }
             return false;
         }
-        User userSave = nextGenUserRepository.getUserByToken(user.getToken());
-        if (userSave != null && !userSave.getEmail().isEmpty()){
+
+        public boolean loginUserEmail(User user) {
+            if (user == null ||  user.getEmail() == null || user.getPassword() == null) {
+                return false;
+            }
+            if (!isValidEmail(user.getEmail())){
+                return false;
+            }
+            User userSave = nextGenUserRepository.getUserByEmail(user.getEmail());
+            if (existsByEmail(user.getEmail()) && verifyPassword(user.getPassword(), userSave.getPassword())){
+                generateToken(userSave.getEmail());
+                return true;
+            }
+            return false;
+        }
+
+        public boolean loginUserToken(User user) {
+            if (user == null ||  user.getToken() == null) {
+                return false;
+            }
+            User userSave = nextGenUserRepository.getUserByToken(user.getToken());
+            if (userSave != null && !userSave.getEmail().isEmpty()){
+                return true;
+            }
+            return false;
+        }
+
+        public boolean generateToken(String email) {
+            User user = nextGenUserRepository.getUserByEmail(email);
+            String token = UUID.randomUUID().toString();
+            user.setToken(token);
+            nextGenUserRepository.save(user);
             return true;
         }
-        return false;
-    }
 
-    public boolean generateToken(String email) {
-        User user = nextGenUserRepository.getUserByEmail(email);
-        String token = UUID.randomUUID().toString();
-        user.setToken(token);
-        nextGenUserRepository.save(user);
-        return true;
-    }
-
-    public User getUserByToken(String token) {
-        return nextGenUserRepository.getUserByToken(token);
-    }
-
-    public boolean isAdmin(String token){
-        if (nextGenUserRepository.existsByToken(token)){
-            User user = nextGenUserRepository.getUserByToken(token);
-            return user.getRole().equals("Administrateur");
+        public User getUserByToken(String token) {
+            return nextGenUserRepository.getUserByToken(token);
         }
-        return false;
-    }
 
-    public List<User> getAllUsers(String token) {
-        if (isAdmin(token)){
-            return nextGenUserRepository.findAll();
+        public boolean isAdmin(String token){
+            if (nextGenUserRepository.existsByToken(token)){
+                User user = nextGenUserRepository.getUserByToken(token);
+                return user.getRole().equals("Administrateur");
+            }
+            return false;
         }
-        return Collections.emptyList();
+
+        public List<User> getAllUsers(String token) {
+            if (isAdmin(token)){
+                return nextGenUserRepository.findAll();
+            }
+            return Collections.emptyList();
+        }
     }
-}
