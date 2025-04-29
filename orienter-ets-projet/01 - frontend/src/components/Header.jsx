@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
+// Composant pour la barre de navigation du site
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -10,8 +11,9 @@ const Header = () => {
   const [profilePicUrl, setProfilePicUrl] = useState('https://i.pinimg.com/1200x/46/72/f8/4672f876389036583190d93a71aa6cb2.jpg');
   const [userEmail, setUserEmail] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
-  
+ 
   useEffect(() => {
+    // Vérifie si utilisateur est administrateur
     const checkAdmin = () => {
       try {
         const storedData = localStorage.getItem('user');
@@ -23,16 +25,17 @@ const Header = () => {
         }
       } catch (e) {}
     };
-    
+   
     checkAdmin();
-    
+   
     if (user && user.token) {
       fetchProfileData();
     } else if (user) {
       setUserEmail(user.email);
     }
   }, [user]);
-  
+ 
+  // Récupère les données du profil utilisateur
   const fetchProfileData = async () => {
     try {
       let token;
@@ -43,24 +46,24 @@ const Header = () => {
           token = userData.token;
         }
       } catch (e) {}
-      
+     
       if (!token && user) {
         token = user.token;
       }
-      
+     
       const headers = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       };
-      
+     
       const response = await axios.post('https://springboot-projetorientation-ddapbxdnhkatfgdc.canadaeast-01.azurewebsites.net/nextgen/profil', {
         token: token
       }, { headers });
-      
+     
       if (response.data && response.data.picture_url) {
         setProfilePicUrl(response.data.picture_url);
       }
-      
+     
       if (response.data && response.data.email) {
         setUserEmail(response.data.email);
       } else if (user) {
@@ -72,18 +75,19 @@ const Header = () => {
       }
     }
   };
-  
+ 
+  // Gère la déconnexion de utilisateur
   const handleLogout = () => {
     logout();
     navigate('/');
   };
-  
+ 
   const leftLinks = [
     { to: '/', label: 'Accueil' },
     { to: '/formations', label: 'Programmes' },
     { to: '/orientation', label: 'Orientation' },
   ];
-  
+ 
   return (
     <header className="shadow-md" role="banner">
       <nav className="bg-[#b91c1c]" aria-label="Navigation principale">
